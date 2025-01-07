@@ -2,6 +2,7 @@ from haystack import Pipeline
 from haystack.components.generators.chat import OpenAIChatGenerator
 from getpass import getpass
 import os
+import pickle
 from haystack.dataclasses import ChatMessage
 from haystack.components.builders import ChatPromptBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
@@ -10,24 +11,23 @@ from haystack.components.embedders import SentenceTransformersDocumentEmbedder
 from haystack import Document
 from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
+from haystack.document_stores.types import DuplicatePolicy
 
 
 # Shout out to deepset-ai for the nice tutorial
-
-
+embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 document_store = InMemoryDocumentStore()
 
-dataset = load_dataset("./data", split="test")
-# TODO: optimize this and deduplicate
-docs = [Document(content=doc[f"text_description"],
-                 meta=doc["image_filename"] + str(i)) for i, doc in enumerate(dataset)]
+with open("data/embedded_docs.pickle", 'rb') as f:
+    docs = pickle.load(f)
 
-embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 doc_embedder = SentenceTransformersDocumentEmbedder(model=embedding_model)
 doc_embedder.warm_up()
 
 docs_with_embeddings = doc_embedder.run(docs)
-document_store.write_documents(docs_with_embeddings["documents"])
+document_store.write_documents(
+    docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
+
 
 text_embedder = SentenceTransformersTextEmbedder(
     model=embedding_model)
