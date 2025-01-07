@@ -12,10 +12,7 @@ from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 
 
-if True:  # Shout out to deepset-ai for the nice tutorial
-    from haystack.telemetry import tutorial_running
-
-    tutorial_running(27)
+# Shout out to deepset-ai for the nice tutorial
 
 
 document_store = InMemoryDocumentStore()
@@ -33,7 +30,7 @@ docs_with_embeddings = doc_embedder.run(docs)
 document_store.write_documents(docs_with_embeddings["documents"])
 
 text_embedder = SentenceTransformersTextEmbedder(
-    model="sentence-transformers/all-MiniLM-L6-v2")
+    model=embedding_model)
 
 retriever = InMemoryEmbeddingRetriever(document_store)
 
@@ -52,8 +49,7 @@ Answer:
 prompt_builder = ChatPromptBuilder(template=template)
 
 if "OPENAI_API_KEY" not in os.environ:
-    os.environ["OPENAI_API_KEY"] = getpass(
-        "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")
+    os.environ["OPENAI_API_KEY"] = "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"
 chat_generator = OpenAIChatGenerator(model="gpt-4o-mini")
 
 basic_rag_pipeline = Pipeline()
@@ -69,12 +65,7 @@ basic_rag_pipeline.connect("text_embedder.embedding",
 basic_rag_pipeline.connect("retriever", "prompt_builder")
 basic_rag_pipeline.connect("prompt_builder.prompt", "llm.messages")
 
-# Now, connect the components to each other
-basic_rag_pipeline.connect("text_embedder.embedding",
-                           "retriever.query_embedding")
-basic_rag_pipeline.connect("retriever", "prompt_builder")
-basic_rag_pipeline.connect("prompt_builder.prompt", "llm.messages")
-
+print(basic_rag_pipeline)
 question = "What does Rhodes Statue look like?"
 
 response = basic_rag_pipeline.run(
