@@ -23,34 +23,42 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 
 
-def load_document_store(file_path: str):
+def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
     """
-    Load documents from a JSON file and initialize an InMemoryDocumentStore.
+    Load embeddings and documents from a JSON file into an InMemoryDocumentStore.
 
-    :param file_path: The path to the JSON file containing the document store data.
-    :return: An initialized InMemoryDocumentStore with the loaded documents.
+    :param file_path: Path to the JSON file containing the document store data.
+    :return: An initialized InMemoryDocumentStore with documents having embeddings.
     """
     document_store = InMemoryDocumentStore()
-    
+
     with open(file_path, "r") as file:
         data = json.load(file)
-    
+
     documents = data.get("documents", [])
-    print(f"Number of documents: {len(documents)}")
-    
-    # Load data into the DocumentStore
-    document_store.load_from_disk(path=file_path)
-    
+    print(f"Number of documents in the JSON: {len(documents)}")
+
+    documents_with_embeddings = [
+        Document(
+            content=doc.get("content"), 
+            embedding=doc.get("embedding"),
+            meta=doc.get("meta", {})
+        )
+        for doc in documents if "embedding" in doc
+    ]
+    print(f"Number of documents with embeddings: {len(documents_with_embeddings)}")
+
+    # Write documents into the document store
+    document_store.write_documents(documents_with_embeddings)
+
     return document_store
 
-document_store = InMemoryDocumentStore()
-load_document_store(file_path = '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data/DocStore.json')
 
 embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 text_embedder = SentenceTransformersTextEmbedder(
     model=embedding_model)
 
-retriever = InMemoryEmbeddingRetriever(document_store)
+retriever = InMemoryEmbeddingRetriever(load_document_store_with_embeddings(file_path= '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data/DocStore.json'))
 
 template = [ChatMessage.from_user("""
 Given the following information, answer the question.
@@ -87,6 +95,7 @@ print(basic_rag_pipeline)
 question = "Which car model from Aston Martin is categorized as a Subcompact Car?"
 
 response = basic_rag_pipeline.run(
-    {"text_embedder": {"text": question}, "prompt_builder": {"question": question}})
+    {"text_embedder": {"text": question}, "prompt_builder": {"question": question}}, include_outputs_from= ['text_embedder', 'retriever', 'prompt_builder', 'llm'
+    ])
 
 print(response["llm"]["replies"][0].text)
