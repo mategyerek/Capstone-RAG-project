@@ -4,7 +4,7 @@ from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 import pickle
-import os 
+import os
 import json
 import json
 from haystack import Pipeline
@@ -40,13 +40,14 @@ def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore
 
     documents_with_embeddings = [
         Document(
-            content=doc.get("content"), 
+            content=doc.get("content"),
             embedding=doc.get("embedding"),
             meta=doc.get("meta", {})
         )
         for doc in documents if "embedding" in doc
     ]
-    print(f"Number of documents with embeddings: {len(documents_with_embeddings)}")
+    print(f"Number of documents with embeddings: {
+          len(documents_with_embeddings)}")
 
     # Write documents into the document store
     document_store.write_documents(documents_with_embeddings)
@@ -54,48 +55,51 @@ def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore
     return document_store
 
 
-embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
-text_embedder = SentenceTransformersTextEmbedder(
-    model=embedding_model)
+if __name__ == "__main__":
+    embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
+    text_embedder = SentenceTransformersTextEmbedder(
+        model=embedding_model)
 
-retriever = InMemoryEmbeddingRetriever(load_document_store_with_embeddings(file_path= '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data/DocStore.json'))
+    retriever = InMemoryEmbeddingRetriever(
+        load_document_store_with_embeddings(file_path='./data/DocStore.json'))
 
-template = [ChatMessage.from_user("""
-Given the following information, answer the question.
+    template = [ChatMessage.from_user("""
+    Given the following information, answer the question.
 
-Context:
-{% for document in documents %}
-    {{ document.content }}
-{% endfor %}
+    Context:
+    {% for document in documents %}
+        {{ document.content }}
+    {% endfor %}
 
-Question: {{question}}
-Answer:
-""")]
+    Question: {{question}}
+    Answer:
+    """)]
 
-prompt_builder = ChatPromptBuilder(template=template)
+    prompt_builder = ChatPromptBuilder(template=template)
 
-if "OPENAI_API_KEY" not in os.environ:
-    os.environ["OPENAI_API_KEY"] = "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"
-chat_generator = OpenAIChatGenerator(model="gpt-4o-mini")
+    if "OPENAI_API_KEY" not in os.environ:
+        os.environ["OPENAI_API_KEY"] = "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"
+    chat_generator = OpenAIChatGenerator(model="gpt-4o-mini")
 
-basic_rag_pipeline = Pipeline()
-# Add components to your pipeline
-basic_rag_pipeline.add_component("text_embedder", text_embedder)
-basic_rag_pipeline.add_component("retriever", retriever)
-basic_rag_pipeline.add_component("prompt_builder", prompt_builder)
-basic_rag_pipeline.add_component("llm", chat_generator)
+    basic_rag_pipeline = Pipeline()
+    # Add components to your pipeline
+    basic_rag_pipeline.add_component("text_embedder", text_embedder)
+    basic_rag_pipeline.add_component("retriever", retriever)
+    basic_rag_pipeline.add_component("prompt_builder", prompt_builder)
+    basic_rag_pipeline.add_component("llm", chat_generator)
 
-# Now, connect the components to each other
-basic_rag_pipeline.connect("text_embedder.embedding",
-                           "retriever.query_embedding")
-basic_rag_pipeline.connect("retriever", "prompt_builder")
-basic_rag_pipeline.connect("prompt_builder.prompt", "llm.messages")
+    # Now, connect the components to each other
+    basic_rag_pipeline.connect("text_embedder.embedding",
+                               "retriever.query_embedding")
+    basic_rag_pipeline.connect("retriever", "prompt_builder")
+    basic_rag_pipeline.connect("prompt_builder.prompt", "llm.messages")
 
-print(basic_rag_pipeline)
-question = "Which car model from Aston Martin is categorized as a Subcompact Car?"
-
-response = basic_rag_pipeline.run(
-    {"text_embedder": {"text": question}, "prompt_builder": {"question": question}}, include_outputs_from= ['text_embedder', 'retriever', 'prompt_builder', 'llm'
-    ])
-
-print(response["llm"]["replies"][0].text)
+    print(basic_rag_pipeline)
+    questions = ["Which car model from Aston Martin is categorized as a Subcompact Car?",
+                 "Which car model from Ferrari is categorized as a Subcompact Car?"]
+    responses = []
+    for question in questions:
+        response = basic_rag_pipeline.run(
+            {"text_embedder": {"text": question}, "prompt_builder": {"question": question}}, include_outputs_from=['text_embedder', 'retriever', 'prompt_builder', 'llm'])
+        responses.append(response)
+        print(response["llm"]["replies"][0].text)

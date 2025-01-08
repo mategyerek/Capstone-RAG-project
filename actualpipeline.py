@@ -1,6 +1,5 @@
 from haystack import Pipeline
 from haystack.components.generators.chat import OpenAIChatGenerator
-from getpass import getpass
 import os
 import pickle
 from haystack.dataclasses import ChatMessage
@@ -8,13 +7,10 @@ from haystack.components.builders import ChatPromptBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
 from haystack.components.embedders import SentenceTransformersDocumentEmbedder
-from haystack import Document
-from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 
 
-# Shout out to deepset-ai for the nice tutorial
 embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
 document_store = InMemoryDocumentStore()
 

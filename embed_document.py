@@ -4,29 +4,25 @@ from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 import pickle
-import os 
+import os
 
 
-dataset = load_dataset("./data", split="test")
-# TODO: optimize this and deduplicate
-docs = [Document(content=doc["text_description"],
-                 meta={"filename": doc["image_filename"]}) for doc in dataset]
+def embed_documents(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
+    dataset = load_dataset("./data", split="test")
+    # TODO: optimize this and deduplicate
+    docs = [Document(content=doc["text_description"],
+                     meta={"filename": doc["image_filename"]}) for doc in dataset]
 
-document_store = InMemoryDocumentStore()
-with open("data/embedded_docs.pickle", 'wb') as file:
-    pickle.dump(docs, file, pickle.HIGHEST_PROTOCOL)
+    document_store = InMemoryDocumentStore()
 
-embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
+    doc_embedder = SentenceTransformersDocumentEmbedder(model=embedding_model)
+    doc_embedder.warm_up()
 
-with open("data/embedded_docs.pickle", 'rb') as f:
-    docs = pickle.load(f)
+    docs_with_embeddings = doc_embedder.run(docs)
+    document_store.write_documents(
+        docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
+    return document_store
 
-doc_embedder = SentenceTransformersDocumentEmbedder(model=embedding_model)
-doc_embedder.warm_up()
-
-docs_with_embeddings = doc_embedder.run(docs)
-document_store.write_documents(
-    docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
 
 def save_database_to_disk(database, path: str) -> None:
     """
@@ -38,19 +34,14 @@ def save_database_to_disk(database, path: str) -> None:
     # Validate the provided path
     if os.path.isdir(path):
         path = os.path.join(path, "DocStore.json")
-    
+
     # Ensure the path ends with a .json file extension
     if not path.endswith(".json"):
         raise ValueError("The file path must end with '.json'.")
 
-    # Call the method 
+    # Call the method
     database.save_to_disk(path)
-    
-
-save_database_to_disk(document_store, path = '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data')
-
-with open("data/embedded_docs.pickle", 'wb') as file:
-    pickle.dump(docs, file, pickle.HIGHEST_PROTOCOL)
 
 
-
+ds = embed_documents()
+save_database_to_disk(ds, path='./data')
