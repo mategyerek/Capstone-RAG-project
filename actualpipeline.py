@@ -72,3 +72,5 @@ response = basic_rag_pipeline.run(
     {"text_embedder": {"text": question}, "prompt_builder": {"question": question}})
 
 print(response["llm"]["replies"][0].text)
+
+print(response["retriever"])
