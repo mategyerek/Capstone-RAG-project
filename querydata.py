@@ -5,25 +5,33 @@ answer_list = df_all['answer'].loc[0:228].tolist()
 chunk_id_list = df_all['chunk_id'].loc[0:228].tolist()
 text_list = df_all['text_description'].loc[0:228].tolist()
 
-# querys and texts
-query_dict = {}
+# list of texts
+texts = []
+current_query = query_list[0]
+current_text = []
 
 for query, text in zip(query_list, text_list):
-    if query not in query_dict:
-        query_dict[query] = []
-    query_dict[query].append(text)
+    if query == current_query:
+        current_text.append(text)
+    else:
+        texts.append(current_text)
+        current_query = query
+        current_text = [text]
 
-# [[query1, [id1, id2]], [query2, [id3, id4, id5]], ...]
-query_text = [[query, text] for query, text in query_dict.items()]
+if current_text:
+    texts.append(current_text)
 
-print(query_text[0])
+# list of answers
+answers = [answer_list[0]]
+for answer in answer_list[1:]:
+    if answer != answers[-1]:
+        answers.append(answer)
 
-# querys and answers
-queryanswer = []
+# list of querys
+querys = [query_list[0]]
+for query in query_list[1:]:
+    if query != querys[-1]:
+        querys.append(query)
 
-for i in range(len(query_list)):
-    if i == 0 or [query_list[i], answer_list[i]] != queryanswer[-1]:
-        # [[query1, answer1], [query2, answer2], ...]
-        queryanswer.append([query_list[i], answer_list[i]])
-
-print(queryanswer[0])
+i = 1
+print(querys[i], texts[i], answers[i])
