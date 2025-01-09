@@ -13,7 +13,7 @@ from getpass import getpass
 import os
 import pickle
 from haystack.dataclasses import ChatMessage
-from haystack.components.builders import ChatPromptBuilder
+from haystack.components.builders import ChatPromptBuilder, AnswerBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
 from haystack.components.embedders import SentenceTransformersDocumentEmbedder
@@ -86,20 +86,33 @@ if __name__ == "__main__":
     basic_rag_pipeline.add_component("text_embedder", text_embedder)
     basic_rag_pipeline.add_component("retriever", retriever)
     basic_rag_pipeline.add_component("prompt_builder", prompt_builder)
-    basic_rag_pipeline.add_component("llm", chat_generator)
+    basic_rag_pipeline.add_component("generator", chat_generator)
+    basic_rag_pipeline.add_component("answer_builder", AnswerBuilder())
 
     # Now, connect the components to each other
     basic_rag_pipeline.connect("text_embedder.embedding",
                                "retriever.query_embedding")
     basic_rag_pipeline.connect("retriever", "prompt_builder")
-    basic_rag_pipeline.connect("prompt_builder.prompt", "llm.messages")
+    basic_rag_pipeline.connect("prompt_builder.prompt", "generator.messages")
+    basic_rag_pipeline.connect("generator.replies", "answer_builder.replies")
+    basic_rag_pipeline.connect("retriever", "answer_builder.documents")
 
     print(basic_rag_pipeline)
     questions = ["Which car model from Aston Martin is categorized as a Subcompact Car?",
                  "Which car model from Ferrari is categorized as a Subcompact Car?"]
     responses = []
+    answers = []
+    documents = []
     for question in questions:
         response = basic_rag_pipeline.run(
-            {"text_embedder": {"text": question}, "prompt_builder": {"question": question}}, include_outputs_from=['text_embedder', 'retriever', 'prompt_builder', 'llm'])
+            {"text_embedder": {"text": question}, "prompt_builder": {"question": question}, "answer_builder": {"query": question}}, include_outputs_from={"retriever"})
         responses.append(response)
-        print(response["llm"]["replies"][0].text)
+        print(response["retriever"])
+        answers.append(response["answer_builder"]["answers"][0].data)
+        current_docs = response["answer_builder"]["answers"][0].documents
+        documents.append([doc.content for doc in current_docs])
+
+print(len(questions), len(answers), len(documents))
+
+with open("./data/debug.pickle", "wb") as f:
+    pickle.dump([questions, answers, documents], f, pickle.HIGHEST_PROTOCOL)
