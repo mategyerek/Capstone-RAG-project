@@ -3,7 +3,6 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 import pickle
 import os
 import json
-import json
 from haystack import Pipeline
 from haystack.components.generators.chat import OpenAIChatGenerator
 import os
@@ -18,7 +17,9 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
-
+from embed_document import load_json_file
+from embed_document import extract_document_contents
+import random 
 
 
 
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         model=embedding_model)
 
     retriever = InMemoryEmbeddingRetriever(
-        load_document_store_with_embeddings(file_path='./data/DocStore.json'))
+        load_document_store_with_embeddings(file_path='./data/DocMerged.json'))
 
     template = [ChatMessage.from_user("""
     Given the following information, answer the question.
@@ -116,9 +117,69 @@ print(len(questions), len(answers), len(documents))
 with open("./data/debug.pickle", "wb") as f:
     pickle.dump([questions, answers, documents], f, pickle.HIGHEST_PROTOCOL)
 
+#Setting up Evaluation Pipeline
+all_questions = load_json_file('data/querys.json')
+all_ground_truth_answers = load_json_file('data/answers.json')
+all_documents = extract_document_contents('./data/DocMerged.json')
+
+
+questions, ground_truth_answers, ground_truth_docs = zip(
+    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), 30)
+)
+
 eval_pipeline = Pipeline()
 eval_pipeline.add_component("doc_mrr_evaluator", DocumentMRREvaluator())
 eval_pipeline.add_component("faithfulness", FaithfulnessEvaluator())
 eval_pipeline.add_component("sas_evaluator", SASEvaluator(model="sentence-transformers/all-MiniLM-L6-v2"))
 
 
+rag_answers = []
+retrieved_docs = []
+
+for question in list(questions):
+    response = basic_rag_pipeline.run(
+        {
+            "text_embedder": {"text": question},
+            "prompt_builder": {"question": question},
+            "answer_builder": {"query": question},
+        }
+    )
+    print(f"Question: {question}")
+    print("Answer from pipeline:")
+    print(response["answer_builder"]["answers"][0].data)
+    print("\n-----------------------------------\n")
+
+    rag_answers.append(response["answer_builder"]["answers"][0].data)
+    retrieved_docs.append(response["answer_builder"]["answers"][0].documents)
+
+
+
+
+results = eval_pipeline.run(
+    {
+        "doc_mrr_evaluator": {
+            "ground_truth_documents": list([d] for d in ground_truth_docs),
+            "retrieved_documents": retrieved_docs,
+        },
+        "faithfulness": {
+            "questions": list(questions),
+            "contexts": list([d] for d in ground_truth_docs),
+            "predicted_answers": rag_answers,
+        },
+        "sas_evaluator": {"predicted_answers": rag_answers, "ground_truth_answers": list(ground_truth_answers)},
+    }
+)
+
+from haystack.evaluation.eval_run_result import EvaluationRunResult
+
+inputs = {
+    "question": list(questions),
+    "contexts": list([d] for d in ground_truth_docs),
+    "answer": list(ground_truth_answers),
+    "predicted_answer": rag_answers,
+}
+
+evaluation_result = EvaluationRunResult(run_name="pubmed_rag_pipeline", inputs=inputs, results=results)
+evaluation_result.score_report()
+results_df = evaluation_result.to_pandas()
+results_df.to_csv('./data/results.csv', index=False)

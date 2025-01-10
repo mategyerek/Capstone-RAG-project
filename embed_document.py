@@ -25,7 +25,7 @@ def embed_documents(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
     return document_store
 
 
-def save_database_to_disk(database, path: str) -> None:
+def save_database_to_disk(database, path: str, name: str) -> None:
     """
     Function to validate the path and call the save_to_disk method.
 
@@ -34,7 +34,7 @@ def save_database_to_disk(database, path: str) -> None:
     """
     # Validate the provided path
     if os.path.isdir(path):
-        path = os.path.join(path, "DocStore.json")
+        path = os.path.join(path, name)
 
     # Ensure the path ends with a .json file extension
     if not path.endswith(".json"):
@@ -45,7 +45,7 @@ def save_database_to_disk(database, path: str) -> None:
 
 
 #ds = embed_documents()
-##ave_database_to_disk(ds, path='./data')
+#save_database_to_disk(ds, path='./data')
 
 def embed_documents_filtered(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
     with open("./data/texts.json", "r", encoding="utf-8") as f:
@@ -64,7 +64,30 @@ def embed_documents_filtered(embedding_model="sentence-transformers/all-MiniLM-L
 
 
 filtered_docs = embed_documents_filtered()
-save_database_to_disk(filtered_docs, path='./data')
+save_database_to_disk(filtered_docs, path='./data', name = 'DocMerged.json')
+
+def load_json_file(file_path: str) -> dict:
+    """Reads a JSON file and returns its contents as a Python dictionary."""
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+        return data
+    except FileNotFoundError:
+        print(f"Error: The file at {file_path} was not found.")
+        return {}
+    except json.JSONDecodeError:
+        print(f"Error: The file at {file_path} is not a valid JSON file.")
+        return {}
+
+
+def extract_document_contents(file_path):
+    with open(file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+    
+    # Extract the content from each document
+    document_contents = [Document(content=doc["content"]) for doc in data.get("documents", [])]
+    
+    return document_contents
 
 
 
