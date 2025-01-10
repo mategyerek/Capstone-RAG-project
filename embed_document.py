@@ -5,6 +5,7 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.document_stores.types import DuplicatePolicy
 import pickle
 import os
+import json
 
 
 def embed_documents(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
@@ -43,5 +44,27 @@ def save_database_to_disk(database, path: str) -> None:
     database.save_to_disk(path)
 
 
-ds = embed_documents()
-save_database_to_disk(ds, path='./data')
+#ds = embed_documents()
+##ave_database_to_disk(ds, path='./data')
+
+def embed_documents_filtered(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
+    with open("./data/texts.json", "r", encoding="utf-8") as f:
+        dataset = json.load(f)
+    docs = [
+        Document(content=" ".join(doc_group))  # Combine all text segments into one string
+        for doc_group in dataset
+    ]
+    document_store = InMemoryDocumentStore()
+    doc_embedder = SentenceTransformersDocumentEmbedder(model=embedding_model)
+    doc_embedder.warm_up()
+    docs_with_embeddings = doc_embedder.run(docs)
+    document_store.write_documents(
+        docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
+    return document_store
+
+
+filtered_docs = embed_documents_filtered()
+save_database_to_disk(filtered_docs, path='./data')
+
+
+

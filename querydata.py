@@ -35,3 +35,23 @@ for query in query_list[1:]:
 
 i = 1
 print(querys[i], texts[i], answers[i])
+
+import json
+import os
+
+# Ensure the data folder exists
+os.makedirs('./data', exist_ok=True)
+
+# Save each list in separate files
+with open('./data/querys.json', 'w', encoding='utf-8') as f:
+    json.dump(querys, f, ensure_ascii=False, indent=4)
+
+with open('./data/texts.json', 'w', encoding='utf-8') as f:
+    json.dump(texts, f, ensure_ascii=False, indent=4)
+
+with open('./data/answers.json', 'w', encoding='utf-8') as f:
+    json.dump(answers, f, ensure_ascii=False, indent=4)
+
+print("Data saved in separate files: querys.json, texts.json, answers.json")
+
+
