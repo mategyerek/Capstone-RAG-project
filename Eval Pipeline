@@ -98,33 +98,18 @@ if __name__ == "__main__":
     basic_rag_pipeline.connect("retriever", "answer_builder.documents")
 
     print(basic_rag_pipeline)
-    questions = ["Which car model from Aston Martin is categorized as a Subcompact Car?",
-                 "Which car model from Ferrari is categorized as a Subcompact Car?"]
-    responses = []
-    answers = []
-    documents = []
-    for question in questions:
-        response = basic_rag_pipeline.run(
-            {"text_embedder": {"text": question}, "prompt_builder": {"question": question}, "answer_builder": {"query": question}}, include_outputs_from={"retriever"})
-        responses.append(response)
-        print(response["retriever"])
-        answers.append(response["answer_builder"]["answers"][0].data)
-        current_docs = response["answer_builder"]["answers"][0].documents
-        documents.append([doc.content for doc in current_docs])
-
-print(len(questions), len(answers), len(documents))
-
-with open("./data/debug.pickle", "wb") as f:
-    pickle.dump([questions, answers, documents], f, pickle.HIGHEST_PROTOCOL)
-
+    
 #Setting up Evaluation Pipeline
 all_questions = load_json_file('data/querys.json')
 all_ground_truth_answers = load_json_file('data/answers.json')
 all_documents = extract_document_contents('./data/DocMerged.json')
+print(len(all_questions), len(all_ground_truth_answers), len(all_documents)) #100 100 77 respectively 
 
 
+#When you try to pass all questions and answers, it raises a ValueError: Sample larger than population or is negative. 
+#You need to pass a value between 1 and 77 (the number of documents) 
 questions, ground_truth_answers, ground_truth_docs = zip(
-    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), 30)
+    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), 100)
 )
 
 eval_pipeline = Pipeline()
