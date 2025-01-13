@@ -61,15 +61,15 @@ if __name__ == "__main__":
         load_document_store_with_embeddings(file_path='./data/DocMerged.json'))
 
     template = [ChatMessage.from_user("""
-    Given the following information, answer the question.
-
+    Given a context, provide ONLY the answers to the questions
+    
     Context:
     {% for document in documents %}
         {{ document.content }}
     {% endfor %}
 
     Question: {{question}}
-    Answer:
+    Answer:                                  
     """)]
 
     prompt_builder = ChatPromptBuilder(template=template)
