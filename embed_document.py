@@ -51,7 +51,6 @@ def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6
     with open("./data/texts.json", "r", encoding="utf-8") as f:
         dataset = json.load(f)
     docs = [
-        # Combine all text segments into one string
         Document(content=doc)
         for doc in dataset
     ]
@@ -60,7 +59,7 @@ def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6
     doc_embedder.warm_up()
     docs_with_embeddings = doc_embedder.run(docs)
     document_store.write_documents(
-        docs_with_embeddings["documents"], policy=DuplicatePolicy.NONE)
+        docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
     return document_store
 
 
