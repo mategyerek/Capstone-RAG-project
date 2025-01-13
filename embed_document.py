@@ -52,15 +52,15 @@ def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6
         dataset = json.load(f)
     docs = [
         # Combine all text segments into one string
-        Document(content=" ".join(doc_group))
-        for doc_group in dataset
+        Document(content=doc)
+        for doc in dataset
     ]
     document_store = InMemoryDocumentStore()
     doc_embedder = SentenceTransformersDocumentEmbedder(model=embedding_model)
     doc_embedder.warm_up()
     docs_with_embeddings = doc_embedder.run(docs)
     document_store.write_documents(
-        docs_with_embeddings["documents"], policy=DuplicatePolicy.SKIP)
+        docs_with_embeddings["documents"], policy=DuplicatePolicy.NONE)
     return document_store
 
 
