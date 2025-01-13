@@ -1,3 +1,5 @@
+import sys 
+print(sys.version)
 from haystack.evaluation.eval_run_result import EvaluationRunResult
 from haystack import Document
 from haystack.document_stores.in_memory import InMemoryDocumentStore
@@ -15,7 +17,13 @@ from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
 from embed_document import load_json_file, extract_document_contents
 import random
-
+import pandas as pd 
+from bert_score import score
+import logging
+import transformers
+transformers.tokenization_utils.logger.setLevel(logging.ERROR)
+transformers.configuration_utils.logger.setLevel(logging.ERROR)
+transformers.modeling_utils.logger.setLevel(logging.ERROR)
 
 def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
     """
@@ -158,8 +166,35 @@ inputs = {
     "predicted_answer": rag_answers,
 }
 
+
+
 evaluation_result = EvaluationRunResult(
     run_name="pubmed_rag_pipeline", inputs=inputs, results=results)
 evaluation_result.score_report()
 results_df = evaluation_result.to_pandas()
+
+#BERT Score Implementation
+results_df['answer'] = results_df['answer'].apply(lambda x: ' '.join(x))
+
+def compute_bertscore(row):
+    prediction = row['predicted_answer']
+    reference = row['answer']
+    
+    # Compute BERTScore for prediction and reference
+    results = score([prediction], [reference], lang='en')
+
+    # Extract precision, recall, and f1 from the results
+    precision = results[0][0]  
+    recall = results[1][0]     
+    f1 = results[2][0]         
+    
+    return pd.Series([precision, recall, f1])
+
+# Apply the function to the DataFrame row-wise with axis=1
+results_df[['precision', 'recall', 'f1']] = results_df.apply(compute_bertscore, axis=1)
+
 results_df.to_csv('./data/results.csv', index=False)
+print('Evaluation results saved!')
+
+
+
