@@ -36,7 +36,7 @@ def save_database_to_disk(database, path: str, name: str) -> None:
     if os.path.isdir(path):
         path = os.path.join(path, name)
 
-    # Ensure the path ends with a .json file extension
+    # Ensure the path ends with a .json file extension (btw it wont cause any problems if it doesnt)
     if not path.endswith(".json"):
         raise ValueError("The file path must end with '.json'.")
 
@@ -44,14 +44,15 @@ def save_database_to_disk(database, path: str, name: str) -> None:
     database.save_to_disk(path)
 
 
-#ds = embed_documents()
-#save_database_to_disk(ds, path='./data')
+# ds = embed_documents()
+# save_database_to_disk(ds, path='./data')
 
-def embed_documents_filtered(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
+def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
     with open("./data/texts.json", "r", encoding="utf-8") as f:
         dataset = json.load(f)
     docs = [
-        Document(content=" ".join(doc_group))  # Combine all text segments into one string
+        # Combine all text segments into one string
+        Document(content=" ".join(doc_group))
         for doc_group in dataset
     ]
     document_store = InMemoryDocumentStore()
@@ -63,8 +64,9 @@ def embed_documents_filtered(embedding_model="sentence-transformers/all-MiniLM-L
     return document_store
 
 
-filtered_docs = embed_documents_filtered()
-save_database_to_disk(filtered_docs, path='./data', name = 'DocMerged.json')
+filtered_docs = embed_documents_grouped()
+save_database_to_disk(filtered_docs, path='./data', name='DocMerged.json')
+
 
 def load_json_file(file_path: str) -> dict:
     """Reads a JSON file and returns its contents as a Python dictionary."""
@@ -83,11 +85,9 @@ def load_json_file(file_path: str) -> dict:
 def extract_document_contents(file_path):
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
-    
+
     # Extract the content from each document
-    document_contents = [Document(content=doc["content"]) for doc in data.get("documents", [])]
-    
+    document_contents = [Document(content=doc["content"])
+                         for doc in data.get("documents", [])]
+
     return document_contents
-
-
-

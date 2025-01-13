@@ -1,26 +1,23 @@
+from haystack.evaluation.eval_run_result import EvaluationRunResult
 from haystack import Document
 from haystack.document_stores.in_memory import InMemoryDocumentStore
-import pickle
 import os
 import json
 from haystack import Pipeline
 from haystack.components.generators.chat import OpenAIChatGenerator
 import os
-import pickle
 from haystack.dataclasses import ChatMessage
 from haystack.components.builders import ChatPromptBuilder, AnswerBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
 from haystack import Document
-from datasets import load_dataset
 from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
 from embed_document import load_json_file
 from embed_document import extract_document_contents
-import random 
-
+import random
 
 
 def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
@@ -98,24 +95,26 @@ if __name__ == "__main__":
     basic_rag_pipeline.connect("retriever", "answer_builder.documents")
 
     print(basic_rag_pipeline)
-    
-#Setting up Evaluation Pipeline
+
+# Setting up Evaluation Pipeline
 all_questions = load_json_file('data/querys.json')
 all_ground_truth_answers = load_json_file('data/answers.json')
 all_documents = extract_document_contents('./data/DocMerged.json')
-print(len(all_questions), len(all_ground_truth_answers), len(all_documents)) #100 100 77 respectively 
+print(len(all_questions), len(all_ground_truth_answers),
+      len(all_documents))  # 100 100 77 respectively
 
 
-#When you try to pass all questions and answers, it raises a ValueError: Sample larger than population or is negative. 
-#You need to pass a value between 1 and 77 (the number of documents) 
+# When you try to pass all questions and answers, it raises a ValueError: Sample larger than population or is negative.
+# You need to pass a value between 1 and 77 (the number of documents)
 questions, ground_truth_answers, ground_truth_docs = zip(
-    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), 100)
+    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), min(len(all_questions), len(all_ground_truth_answers), len(all_documents)))
 )
 
 eval_pipeline = Pipeline()
 eval_pipeline.add_component("doc_mrr_evaluator", DocumentMRREvaluator())
 eval_pipeline.add_component("faithfulness", FaithfulnessEvaluator())
-eval_pipeline.add_component("sas_evaluator", SASEvaluator(model="sentence-transformers/all-MiniLM-L6-v2"))
+eval_pipeline.add_component("sas_evaluator", SASEvaluator(
+    model="sentence-transformers/all-MiniLM-L6-v2"))
 
 
 rag_answers = []
@@ -138,8 +137,6 @@ for question in list(questions):
     retrieved_docs.append(response["answer_builder"]["answers"][0].documents)
 
 
-
-
 results = eval_pipeline.run(
     {
         "doc_mrr_evaluator": {
@@ -155,7 +152,6 @@ results = eval_pipeline.run(
     }
 )
 
-from haystack.evaluation.eval_run_result import EvaluationRunResult
 
 inputs = {
     "question": list(questions),
@@ -164,7 +160,8 @@ inputs = {
     "predicted_answer": rag_answers,
 }
 
-evaluation_result = EvaluationRunResult(run_name="pubmed_rag_pipeline", inputs=inputs, results=results)
+evaluation_result = EvaluationRunResult(
+    run_name="pubmed_rag_pipeline", inputs=inputs, results=results)
 evaluation_result.score_report()
 results_df = evaluation_result.to_pandas()
 results_df.to_csv('./data/results.csv', index=False)
