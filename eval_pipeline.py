@@ -94,18 +94,19 @@ if __name__ == "__main__":
     print(basic_rag_pipeline)
 
 # Setting up Evaluation Pipeline
-all_questions = load_json_file('data/querys.json')
-all_ground_truth_answers = load_json_file('data/answers.json')
+questions = load_json_file('data/querys.json')
+ground_truth_answers = load_json_file('data/answers.json')
 all_documents = extract_document_contents('./data/DocMerged.json')
-print(len(all_questions), len(all_ground_truth_answers),
-      len(all_documents))  # 100 100 77 respectively
 
 
-# When you try to pass all questions and answers, it raises a ValueError: Sample larger than population or is negative.
-# You need to pass a value between 1 and 77 (the number of documents)
-questions, ground_truth_answers, ground_truth_docs = zip(
-    *random.sample(list(zip(all_questions, all_ground_truth_answers, all_documents)), min(len(all_questions), len(all_ground_truth_answers), len(all_documents)))
-)
+with open("./data/doc_lookup.json", "r") as f:
+    lookup_table = json.load(f)
+
+ground_truth_docs = [all_documents[lookup_table.get(
+    str(i))] for i in range(len(questions))]
+
+print(len(questions), len(ground_truth_answers),
+      len(ground_truth_docs))  # 100 100 77 respectively
 
 eval_pipeline = Pipeline()
 eval_pipeline.add_component("doc_mrr_evaluator", DocumentMRREvaluator())
