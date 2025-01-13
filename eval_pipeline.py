@@ -10,13 +10,10 @@ from haystack.dataclasses import ChatMessage
 from haystack.components.builders import ChatPromptBuilder, AnswerBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
-from haystack import Document
-from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
-from embed_document import load_json_file
-from embed_document import extract_document_contents
+from embed_document import load_json_file, extract_document_contents
 import random
 
 

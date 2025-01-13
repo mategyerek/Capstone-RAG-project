@@ -1,26 +1,13 @@
-from haystack.components.embedders import SentenceTransformersDocumentEmbedder
-from haystack import Document
-from datasets import load_dataset
+from haystack import Document, Pipeline
 from haystack.document_stores.in_memory import InMemoryDocumentStore
-from haystack.document_stores.types import DuplicatePolicy
 import pickle
 import os
 import json
-import json
-from haystack import Pipeline
 from haystack.components.generators.chat import OpenAIChatGenerator
-from getpass import getpass
-import os
-import pickle
 from haystack.dataclasses import ChatMessage
 from haystack.components.builders import ChatPromptBuilder, AnswerBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
-from haystack.components.embedders import SentenceTransformersDocumentEmbedder
-from haystack import Document
-from datasets import load_dataset
-from haystack.document_stores.in_memory import InMemoryDocumentStore
-from haystack.document_stores.types import DuplicatePolicy
 
 
 def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
