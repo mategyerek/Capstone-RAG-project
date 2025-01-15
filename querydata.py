@@ -35,4 +35,4 @@ with open('./data/answers.json', 'w', encoding='utf-8') as f:
 with open('./data/doc_lookup.json', 'w', encoding='utf-8') as f:
     json.dump(doc_lookup, f)
 
-print("Data saved in separate files: querys.json, texts.json, answers.json")
+print("Data saved in separate files: querys.json, texts.json, answers.json and doc_lookup.json")
