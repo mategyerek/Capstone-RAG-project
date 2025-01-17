@@ -1,6 +1,7 @@
 from haystack.evaluation.eval_run_result import EvaluationRunResult
 from haystack import Document
 from haystack.document_stores.in_memory import InMemoryDocumentStore
+from haystack_integrations.components.generators.llama_cpp import LlamaCppGenerator
 import os
 import json
 from haystack import Pipeline
@@ -28,7 +29,7 @@ def log_error_to_file(error_message: str):
     """
     Log error messages to a separate text file.
     """
-    error_log_file = './results/errors.txt'
+    error_log_file = './data/errors.txt'
     with open(error_log_file, 'a') as f:
         f.write(f"{error_message}\n")
 
@@ -73,8 +74,12 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
          os.environ["OPENAI_API_KEY"] = "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"
     if "HF_API_TOKEN" not in os.environ:
         os.environ["HF_API_TOKEN"] = "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"
-    chat_generator = HuggingFaceAPIGenerator(api_type="serverless_inference_api",
-                                             api_params={"model": generator_model})
+    """chat_generator = HuggingFaceAPIGenerator(api_type="serverless_inference_api",
+                                             api_params={"model": generator_model})"""
+    chat_generator = LlamaCppGenerator(
+                                        model=generator_model,
+                                        generation_kwargs={"temperature": 2, "max_tokens": 128},
+                                        model_kwargs={"n_gpu_layers": -1})
 
     # Initialize the pipeline
     rag_pipeline = Pipeline()
@@ -120,6 +125,7 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
                 "answer_builder": {"query": question},
             }
         )
+        
         counter += 1
         print(f"Question: {question}")
         print("Answer from pipeline:")
@@ -129,7 +135,7 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
 
         rag_answers.append(response["answer_builder"]["answers"][0].data)
         retrieved_docs.append(response["answer_builder"]["answers"][0].documents)
-
+    #rag_pipeline.graph._node["generator"]["instance"].model.close()
     results = eval_pipeline.run(
         {
             "doc_mrr_evaluator": {
@@ -182,7 +188,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model):
     :param embedding_model: The name of the embedding model.
     :param generator_model: The name of the generator model.
     """
-    filename = f"./results/results_{embedding_model}_{generator_model}.csv"
+    filename = f"./results/results_{embedding_model.replace("/", "_")}_{generator_model.replace("/", "_")}.csv"
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
@@ -204,8 +210,8 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list):
                 
                 rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name)
                 
-                questions = load_json_file('data/querys.json')
-                ground_truth_answers = load_json_file('data/answers.json')
+                questions = load_json_file('data/querys.json')[0:2]
+                ground_truth_answers = load_json_file('data/answers.json')[0:2]
                 all_documents = extract_document_contents(f'./data/{doc_store_name}')
                 
                 with open("./data/doc_lookup.json", "r") as f:
@@ -215,8 +221,9 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list):
                 
                 results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
                 
-                save_evaluation_results(results_df, embedding_model, generator_model)
-
+                #save_evaluation_results(results_df, embedding_model, generator_model)
+                #rag_pipeline.graph._node["generator"]["instance"].model.close()
+                del rag_pipeline
             except Exception as e:
                 # Log any errors
                 error_message = f"Error occurred for {embedding_model} and {generator_model}: {str(e)}"
@@ -227,15 +234,15 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list):
 if __name__ == "__main__":
     # Define your embedding and generator models here
     embedding_models = [
-        "sentence-transformers/nli-bert-base-max-pooling",  # Example model 1
         "sentence-transformers/all-MiniLM-L6-v2",  # Example model 2
-        # Add more models as needed
-        
+        #"sentence-transformers/nli-bert-base-max-pooling",  # Example model 1
+        # Add more models as needed  
     ]
     
     generator_models = [
-        "mistralai/Mistral-7B-Instruct-v0.3",   
-        #Same thing
+        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf", 
+        "model_weights/Llama-3.2-3B-Instruct-IQ4_XS.gguf",
+        
     ]
     
     run_evaluation_for_models(embedding_models, generator_models)  
