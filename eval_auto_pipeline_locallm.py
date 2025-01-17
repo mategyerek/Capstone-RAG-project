@@ -37,7 +37,7 @@ def check_if_results_exist(embedding_model: str, generator_model: str) -> bool:
     file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}.csv"
     return os.path.exists(f'./results/{file_name}')
     
-def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None):
+def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5):
     """
     Create a pipeline dynamically with the given embedding model and generator model.
 
@@ -65,7 +65,7 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
                                              api_params={"model": generator_model})"""
     chat_generator = LlamaCppGenerator(
                                         model=generator_model,
-                                        generation_kwargs={"temperature": temperature, "max_tokens": 128},
+                                        generation_kwargs={"temperature": temperature, "max_tokens": 128, "repeat_penalty": repeat_penalty},
                                         model_kwargs={"n_gpu_layers": -1})
 
     # Initialize the pipeline
@@ -179,7 +179,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model):
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
@@ -195,7 +195,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                     filtered_docs = embed_documents_grouped(embedding_model= embedding_model)
                     save_database_to_disk(filtered_docs, path='./data', name=doc_store_name)
                 
-                rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt)
+                rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty)
                 
                 questions = load_json_file('data/querys.json')[0:2]
                 ground_truth_answers = load_json_file('data/answers.json')[0:2]
@@ -234,8 +234,16 @@ if __name__ == "__main__":
     
     prompt = """Given a context, provide ONLY the answers to the questions without repepating the question. 
     Keep the answers very short, only limiting yourself to directly answering the question.  
-    DO NOT GENERATE MORE QUESTIONS AND DO NOT GENERATE MORE ANSWERS. 
-    
+    DO NOT:
+    - Generate multiple questions and answers.
+    - Answer in multiple sentences.
+    - Include irrelevant information.
+
+    For example:
+    - Question: What is the capital of France?
+    Answer: Paris. (Correct)
+    DO NOT ANSWER: Paris. What is the population of Paris? 2.1 million. (This is Incorrect)
+
     Context:
     {% for document in documents %}
         {{ document.content }}
@@ -244,4 +252,4 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 1.25, prompt = prompt)  
+    run_evaluation_for_models(embedding_models, generator_models, temperature= 1.25, prompt = prompt, repeat_penalty= 1.5)  
