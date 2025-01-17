@@ -28,13 +28,13 @@ def log_error_to_file(error_message: str):
     """
     Log error messages to a separate text file.
     """
-    error_log_file = './data/errors.txt'
+    error_log_file = './results/errors.txt'
     with open(error_log_file, 'a') as f:
         f.write(f"{error_message}\n")
 
 def check_if_results_exist(embedding_model: str, generator_model: str) -> bool:
     file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}.csv"
-    return os.path.exists(f'./data/{file_name}')
+    return os.path.exists(f'./results/{file_name}')
     
 def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str):
     """
@@ -182,7 +182,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model):
     :param embedding_model: The name of the embedding model.
     :param generator_model: The name of the generator model.
     """
-    filename = f"./data/results_{embedding_model}_{generator_model}.csv"
+    filename = f"./results/results_{embedding_model}_{generator_model}.csv"
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
