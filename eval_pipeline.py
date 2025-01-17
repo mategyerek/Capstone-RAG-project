@@ -4,7 +4,7 @@ from haystack.document_stores.in_memory import InMemoryDocumentStore
 import os
 import json
 from haystack import Pipeline
-from haystack.components.generators import HuggingFaceLocalGenerator
+from haystack.components.generators import HuggingFaceAPIGenerator
 import os
 from haystack.dataclasses import ChatMessage
 from haystack.components.builders import PromptBuilder, AnswerBuilder
@@ -64,7 +64,9 @@ if __name__ == "__main__":
         load_document_store_with_embeddings(file_path='./data/DocMerged.json'))
 
     template = """
-    Given a context, provide ONLY the answers to the questions without repepating the question
+    Given a context, provide ONLY the answers to the questions without repepating the question.
+    Keep the answers very short, only limiting yourself to directly answering the question. 
+    DO NOT GENERATE MORE QUESTIONS AND DO NOT GENERATE MORE ANSWERS. 
     
     Context:
     {% for document in documents %}
@@ -82,20 +84,22 @@ if __name__ == "__main__":
     if "HF_API_TOKEN" not in os.environ:
         os.environ["HF_API_TOKEN"] = "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"
     # BEWARE THIS WILL BREAK!
-    chat_generator = HuggingFaceLocalGenerator(model="mistralai/Mistral-7B-Instruct-v0.3", device=ComponentDevice().from_str("cuda"))
+    generator = HuggingFaceAPIGenerator(api_type="serverless_inference_api",
+                                        api_params={"model": "mistralai/Mistral-7B-Instruct-v0.3"},
+                                        generation_kwargs={'temperature': 1.25})
 
     basic_rag_pipeline = Pipeline()
     # Add components to your pipeline
     basic_rag_pipeline.add_component("text_embedder", text_embedder)
     basic_rag_pipeline.add_component("retriever", retriever)
     basic_rag_pipeline.add_component("prompt_builder", prompt_builder)
-    basic_rag_pipeline.add_component("generator", chat_generator)
+    basic_rag_pipeline.add_component("generator", generator)
     basic_rag_pipeline.add_component("answer_builder", AnswerBuilder())
 
     # Now, connect the components to each other
     basic_rag_pipeline.connect("text_embedder.embedding",
                                "retriever.query_embedding")
-    basic_rag_pipeline.connect("retriever", "prompt_builder")
+    basic_rag_pipeline.connect("retriever", "prompt_builder.documents")
     basic_rag_pipeline.connect("prompt_builder", "generator")
     basic_rag_pipeline.connect("generator.replies", "answer_builder.replies")
     basic_rag_pipeline.connect("retriever", "answer_builder.documents")
@@ -115,7 +119,7 @@ if __name__ == "__main__":
         str(i))] for i in range(len(questions))]
 
     print(len(questions), len(ground_truth_answers),
-        len(ground_truth_docs))  # 100 100 77 respectively
+        len(ground_truth_docs))  # 100 100 100 respectively
 
     eval_pipeline = Pipeline()
     eval_pipeline.add_component("doc_mrr_evaluator", DocumentMRREvaluator())
@@ -176,7 +180,7 @@ if __name__ == "__main__":
     results_df = evaluation_result.to_pandas()
 
     #BERT Score Implementation
-    results_df['answer'] = results_df['answer']#.apply(lambda x: ' '.join(x))
+    results_df['answer'] = results_df['answer']
 
     def compute_bertscore(row):
         prediction = row['predicted_answer']
@@ -195,7 +199,7 @@ if __name__ == "__main__":
     # Apply the function to the DataFrame row-wise with axis=1
     results_df[['precision', 'recall', 'f1']] = results_df.apply(compute_bertscore, axis=1)
 
-    results_df.to_csv('./data/results.csv', index=False)
+    results_df.to_csv('./results/results_all-MiniLM-L6-v2_gemma-2-2b-it.csv', index=False)
     print('Evaluation results saved!')
 
 
