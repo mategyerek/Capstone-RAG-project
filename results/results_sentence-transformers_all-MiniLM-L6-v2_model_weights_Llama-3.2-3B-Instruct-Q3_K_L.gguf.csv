@@ -137,7 +137,7 @@ SHOULD OFO RULES BE CONSISTENT STATEWIDE?
      The physical constraints are different; operating conditions too; triggers should be different.
      Different operating conditions, different triggers; physical constraints matter.
      Pipeline and operating conditions differ; thus different OFO triggers.   
-    Which of the following statements regarding PG&E's OFO rules and the state",1.0,0.0,0.7206711769104004,tensor(0.8113),tensor(0.9042),tensor(0.8552)
+    Which of the following statements regarding PG&E's OFO rules and the state",1.0,1.0,0.7206711769104004,tensor(0.8113),tensor(0.9042),tensor(0.8552)
 What is the expected revenue for the power production company in the given quarter?,"[Document(id=464cf46a75382586fa385cc9f1744d845e3787f2daac4cef76482b579fe98aad, content: 'As cash prices continue to be soft for the second quarter, the hedge looks like this:
 Feb. 1 Mar. 27...')]","['$518,880']"," $ 518,880.                         
 
@@ -301,7 +301,7 @@ Code Message Type Cause Solution Fo7 Watchdog er...')]",['Temperature sensor is 
     Question: What fault could cause the 'Ground fault (MPPT generated code F56)'?
     Answer: 
      MPPT ground fault.  
-     In a Xanbus network",1.0,0.8333333333333334,0.522246241569519,tensor(0.7370),tensor(0.8536),tensor(0.7910)
+     In a Xanbus network",1.0,0.6666666666666666,0.522246241569519,tensor(0.7370),tensor(0.8536),tensor(0.7910)
 What types of highway improvements are listed for District 9 in Illinois?,"[Document(id=0807f2c5e8d0a6fe97bb8a0ecd66c031f8eea88bbc1b42fd2b2158d534b28adf, content: 'FY 2024-2029 Rebuild Illinois Highway Improvement Program
 
 District 9
@@ -378,7 +378,7 @@ art
     Question: Who are the co-authors of the book ""Solar thermal energy storage""?
     Answer: SC Mullick, AL Bhargava, D. Reidel Publishing Company, 
     (no additional names).
-",1.0,0.0,0.41607141494750977,tensor(0.7879),tensor(0.9275),tensor(0.8520)
+",1.0,0.42857142857142855,0.41607141494750977,tensor(0.7879),tensor(0.9275),tensor(0.8520)
 What are the major greenhouse gases mentioned in the table?,"[Document(id=97fce91441cb190a86bc5d315e4249876b70214cbb3452169b096ba098c5d9e4, content: '“(qUOd) PITY YoIng :J90ySyIO M ‘AJOJUAU] SUOTSSIMIG OHO VLUVIN 27S re ~~"" Gy THA SNMOUS Tove] GY AGO...')]","['CO2', 'CH4', 'N2O', 'HFCs', 'PFCs', 'SF6', 'NF3']"," CO2: 
      N2O 
     (other greenhouse gases) : Not mentioned.    
@@ -395,7 +395,7 @@ What are the major greenhouse gases mentioned in the table?,"[Document(id=97fce9
 
     Question: What are the hydrocarbon components in commercial crude oil inventories?
     Answer: 
-    Ethane, Propane,",0.0,0.7142857142857143,0.40624845027923584,tensor(0.7425),tensor(0.8017),tensor(0.7709)
+    Ethane, Propane,",0.0,0.42857142857142855,0.40624845027923584,tensor(0.7425),tensor(0.8017),tensor(0.7709)
 What are the different ways AC Support behaves depending on the equipment installed with the Conext SW?,"[Document(id=bef5ada59a3bd8b3eeb7eadc21456fdda4c6a1d765b06aecc09417ab49c0b89d, content: 'Introduction
 
 Conext SW to support local loads by converting excess power from external DC sources c...')]","['SOC - Xanbus-enabled Conext Battery Monitor is installed', 'Enhanced - Xanbus-enabled MPPT solar charge controller is installed', 'Regular - neither Xanbus-enabled battery monitor nor MPPT solar charge controller is installed']"," Xanbus-enabled Conext Battery Monitor installed
@@ -432,7 +432,7 @@ system. Intero...')]","['CERTS microgrid controller using plug-and-play and peer
  
 
     Question: What are some of the reasons why there are limitations on the accurate real-time estimation of available power from curtailed PV plants?
-    Answer",0.0,1.0,0.447441041469574,tensor(0.7798),tensor(0.8166),tensor(0.7977)
+    Answer",0.0,0.6666666666666666,0.447441041469574,tensor(0.7798),tensor(0.8166),tensor(0.7977)
 Which country is Leszek Twardy's organization located in?,"[Document(id=bfad6e9945055bd7bd4a441dfb728bcace91bcb56ca5e82f8c2d52963886dcad, content: 'Tamari, A. Todorov, T. Twardy, L. Urbancic, A. Viadescu, A. Ministry of Energy 216, Jaffa Street P.O...')]",['Poland']," The  country is  PPoland    
     Question: Who is the other member of the European Parliament?
     Answer:                                  
@@ -446,7 +446,7 @@ Which country is Leszek Twardy's organization located in?,"[Document(id=bfad6e99
     Question: Is Leszek Twardy's organization located in Eastern or Western Europe?
     Answer:                                  
      Eastern Europe      
-    Question: Which",0.0,0.0,0.33527109026908875,tensor(0.6138),tensor(0.8408),tensor(0.7096)
+    Question: Which",0.0,0.5,0.33527109026908875,tensor(0.6138),tensor(0.8408),tensor(0.7096)
 What are some characteristics of investors suitable for the Aggressive Growth asset mix?,"[Document(id=10fa1e31db3d516b14974c3b049e97fd94059fec95b2c9fdb9c18abdc2105efb, content: 'Consider portfolio diversification and select your target asset mix.
 
 Portfolio diversification is t...')]","['Seek aggressive growth', 'Can tolerate wide fluctuations in market values, especially over the short term']"," Investor are: Seeking income and Growth growth potential with little or no concern for preserving and minimizing risk, Tolerating wide fluctuations in market with capital appreciation priority.
@@ -563,7 +563,7 @@ Motorola Solutions, In...')]",['120 S Monroe St Tallahassee FL 32301']," (not av
     Question: How often must a registered lobbyist register as required by the Florida Lobbyist Registration Act?
     Answer: Registered lobbyists must register quarterly.
 
-    Question:",0.0,0.75,0.25100135803222656,tensor(0.7391),tensor(0.7282),tensor(0.7336)
+    Question:",0.0,1.0,0.25100135803222656,tensor(0.7391),tensor(0.7282),tensor(0.7336)
 What is the estimated total savings for a PV system in Durham under the net metering (flat rate) billing option over the system's useful life of 25 years?,"[Document(id=2dad2590a94f3fba586ae4fb328d0c2da9aa79d01ee312f34f79500933a64c49, content: 'A Residential Customer Guide to Going Solar - RO1-010
 
 The savings shown in Tables 2 and 3 were calc...')]","['$10,614']"," $10,614    
@@ -599,7 +599,7 @@ Route / Street...')]","['$3,300,000']"," Not Provided.
     Answer: The total length for all projects in District 8 is 3.83 Miles, while the specific question pertains only to a single segment, which has only a 0.3 Miles section. A more precise interpretation would be ""a 0.3-mile segment of the Palomino Dr bridge replacement project"".    
      No. of Miles in each MYP Year - District 8
     Miles in District 8
-    Year 1",0.0,0.6666666666666666,0.13740035891532898,tensor(0.7566),tensor(0.7789),tensor(0.7676)
+    Year 1",0.0,0.5,0.13740035891532898,tensor(0.7566),tensor(0.7789),tensor(0.7676)
 What measures have been taken to improve security at nuclear power plants since 9/11?,"[Document(id=4a2898531fc133b3838e33341136891bb2e144646b4da28f12d538d6653fa52a, content: '‘The Future of Nuclear Power in the United States
 
 February 2012
@@ -617,7 +617,7 @@ tance to assaults and accidents. A...')]","['The Design Basis Threat has been in
 
 
     Question: What type of accident would be more likely to cause the containment to fail, but less likely to be mitigated by underground containments?
-",1.0,0.0,0.4227526783943176,tensor(0.7911),tensor(0.9005),tensor(0.8423)
+",1.0,0.6666666666666666,0.4227526783943176,tensor(0.7911),tensor(0.9005),tensor(0.8423)
 What type of nuclear reactor was involved in the Chernobyl accident?,"[Document(id=03826d818e5437238632755667b0a61b6e0ebb0c33171a33df49641ae5975779, content: 'NUCLEAR FISSION — 253
 
 What Happened at Chernobyl?
@@ -794,7 +794,7 @@ Many polls differentiate between support for existing ...')]","['create incentiv
     Answer: Jackson, Dominique, 2021
  
 
-    Question: Is there a mention of the",0.0,1.0,0.4302319288253784,tensor(0.7616),tensor(0.8355),tensor(0.7968)
+    Question: Is there a mention of the",0.0,0.25,0.4302319288253784,tensor(0.7616),tensor(0.8355),tensor(0.7968)
 What steps can be taken if a biomass project appears viable after evaluation?,"[Document(id=bcef0162538ea6d048b8dcae1a48b948c4175a61e00a11e04045a1bc0b00a0f2, content: 'COMMUNITY BIOMASS ROADMAP
 
 To access this document, go to www.nhrcd.net
@@ -825,7 +825,7 @@ Eliminate minimum and set low maximum parking levels (residential). Adopt develo
      Set a low maximum number of general-purpose passenger vehicle parking spaces for new residential development. 
 
      (three-quarters of a parking space per one-bedroom, studio and efficiency unit; one space per two-bedroom unit; and one-and-a-quarter spaces per three-bedroom and larger unit) 
-     Required disabled spaces, accessible spaces and loading zone spaces do not count toward maximum parking limits.",1.0,0.5,0.8465633392333984,tensor(0.8481),tensor(0.9558),tensor(0.8987)
+     Required disabled spaces, accessible spaces and loading zone spaces do not count toward maximum parking limits.",1.0,1.0,0.8465633392333984,tensor(0.8481),tensor(0.9558),tensor(0.8987)
 What is the projected peak electricity demand in California for the year 2030?,"[Document(id=ec06f48e8d513822cdd0b1604b80a9e62cb28ec25dab75f8296ea753ead2c3cc, content: 'Projected 2030 electricity capacities
 
 CCST
@@ -1106,7 +1106,7 @@ This paper describes in detail the integrated framew...')]","['Risk management i
      CLP Power’s Generation Business Group (GBG) integrated risk management framework is shown in Figure 1. 
      Risk management involves the systematic identification, risk significance evaluation, and control of potential losses that may arise from uncertain problem events, such as fires, explosions, mechanical/electrical failures or natural disasters. 
 
-     It aims to permit contractors,",1.0,0.6666666666666666,0.7692552804946899,tensor(0.8778),tensor(0.9560),tensor(0.9152)
+     It aims to permit contractors,",1.0,0.0,0.7692552804946899,tensor(0.8778),tensor(0.9560),tensor(0.9152)
 Which region has the highest load growth rate from 2020 to 2026?,"[Document(id=a648b7309f83c351dbbd305d7495b6f442d84afc1eac9dd31bd8a5dcde477c8d, content: 'Western Interconnection BPS Dynamics
 
 woodmac.com
