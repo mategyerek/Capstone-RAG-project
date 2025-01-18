@@ -88,9 +88,9 @@ if __name__ == "__main__":
         os.environ["HF_API_TOKEN"] = "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"
     # BEWARE THIS WILL BREAK!
     chat_generator = LlamaCppGenerator(
-                                        model="data/mistral-7b-instruct-v0.2-code-ft.Q6_K.gguf",
-                                        generation_kwargs={"temperature": 0.1},
-                                    )
+                                        model="data/mistral-7b-instruct-v0.1.Q5_K_S.gguf",
+                                        generation_kwargs={"temperature": 0.8, "max_tokens": 128},
+                                        model_kwargs={"n_gpu_layers": -1})
 
     basic_rag_pipeline = Pipeline()
     # Add components to your pipeline

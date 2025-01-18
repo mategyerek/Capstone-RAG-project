@@ -33,8 +33,8 @@ def log_error_to_file(error_message: str):
     with open(error_log_file, 'a') as f:
         f.write(f"{error_message}\n")
 
-def check_if_results_exist(embedding_model: str, generator_model: str) -> bool:
-    file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}.csv"
+def check_if_results_exist(embedding_model: str, generator_model: str, temperature, repeat_penalty) -> bool:
+    file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.csv"
     return os.path.exists(f'./results/{file_name}')
     
 def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5):
@@ -122,7 +122,7 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
 
         rag_answers.append(response["answer_builder"]["answers"][0].data)
         retrieved_docs.append(response["answer_builder"]["answers"][0].documents)
-    #rag_pipeline.graph._node["generator"]["instance"].model.close()
+    rag_pipeline.graph._node["generator"]["instance"].model.close()
     results = eval_pipeline.run(
         {
             "doc_mrr_evaluator": {
@@ -167,7 +167,7 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
 
     return results_df
 
-def save_evaluation_results(results_df, embedding_model, generator_model):
+def save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty):
     """
     Save the evaluation results as a CSV file.
 
@@ -175,7 +175,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model):
     :param embedding_model: The name of the embedding model.
     :param generator_model: The name of the generator model.
     """
-    filename = f"./results/results_{embedding_model.replace("/", "_")}_{generator_model.replace("/", "_")}.csv"
+    filename = f"./results/results_{embedding_model.replace("/", "_")}_{generator_model.replace("/", "_")}_{temperature}_{repeat_penalty}.csv"
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
@@ -183,7 +183,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
-                if check_if_results_exist(embedding_model, generator_model):
+                if check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
                     print(f"Results already exist for {embedding_model} and {generator_model}. Skipping...")
                     continue
 
@@ -197,8 +197,8 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                 
                 rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty)
                 
-                questions = load_json_file('data/querys.json')[0:2]
-                ground_truth_answers = load_json_file('data/answers.json')[0:2]
+                questions = load_json_file('data/querys.json')
+                ground_truth_answers = load_json_file('data/answers.json')
                 all_documents = extract_document_contents(f'./data/{doc_store_name}')
                 
                 with open("./data/doc_lookup.json", "r") as f:
@@ -208,9 +208,8 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                 
                 results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
                 
-                #save_evaluation_results(results_df, embedding_model, generator_model)
+                save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty)
                 #rag_pipeline.graph._node["generator"]["instance"].model.close()
-                del rag_pipeline
             except Exception as e:
                 # Log any errors
                 error_message = f"Error occurred for {embedding_model} and {generator_model}: {str(e)}"
@@ -221,15 +220,20 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
 if __name__ == "__main__":
     # Define your embedding and generator models here
     embedding_models = [
-        "sentence-transformers/all-MiniLM-L6-v2",  # Example model 2
-        #"sentence-transformers/nli-bert-base-max-pooling",  # Example model 1
-        # Add more models as needed  
+        # default: "sentence-transformers/all-MiniLM-L6-v2",
+        "multi-qa-mpnet-base-cos-v1", # (mean, 420MB)
+        "all-mpnet-base-v2", # performance (mean, 420MB)
+        "multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
+        "all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
+        "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
+        "sentence-transformers/nli-bert-base-max-pooling", 
     ]
     
     generator_models = [
-        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf", 
-        "model_weights/Llama-3.2-3B-Instruct-IQ4_XS.gguf",
-        
+        "model_weights/Phi-3.5-mini-instruct-Q5_K_S.gguf",
+        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",  
+        "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
+        "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
     ]
     
     prompt = """Given a context, provide ONLY the answers to the questions without repepating the question. 
@@ -252,4 +256,4 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 1.25, prompt = prompt, repeat_penalty= 1.5)  
+    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 2)  
