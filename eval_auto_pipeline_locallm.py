@@ -230,7 +230,7 @@ if __name__ == "__main__":
     ]
     
     generator_models = [
-        "model_weights/Phi-3.5-mini-instruct-Q5_K_S.gguf",
+        "model_weights/Phi-3.5-mini-instruct-IQ3_XS.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",  
         "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
