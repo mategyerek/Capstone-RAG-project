@@ -124,8 +124,9 @@ def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore
 
     return document_store
 
-def split_list_data(data_list, val_ratio=0.8, test_ratio=0.2):
+def split_list_data(data_list, val_ratio=0.8, test_ratio=0.2, seed=42):
     # Shuffle the data to ensure randomness
+    random.seed(seed)
     random.shuffle(data_list)
 
     val_size = int(len(data_list) * val_ratio)

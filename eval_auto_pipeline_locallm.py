@@ -20,7 +20,7 @@ import pandas as pd
 from bert_score import score
 import logging
 import transformers
-import itertools
+import traceback
 transformers.tokenization_utils.logger.setLevel(logging.ERROR)
 transformers.configuration_utils.logger.setLevel(logging.ERROR)
 transformers.modeling_utils.logger.setLevel(logging.ERROR)
@@ -76,13 +76,13 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
     rag_pipeline.add_component("prompt_builder", prompt_builder)
     rag_pipeline.add_component("generator", chat_generator)
     rag_pipeline.add_component("answer_builder", AnswerBuilder())
-    rag_pipeline.add_component("question_cutter", question_cutter)
+    #rag_pipeline.add_component("question_cutter", question_cutter)
 
     rag_pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
     rag_pipeline.connect("retriever", "prompt_builder")
     rag_pipeline.connect("prompt_builder", "generator")
-    rag_pipeline.connect("generator.replies", "question_cutter.in_text")
-    rag_pipeline.connect("question_cutter.out_text", "answer_builder.replies")
+    rag_pipeline.connect("generator.replies", "answer_builder.replies")
+    #rag_pipeline.connect("question_cutter.out_text", "answer_builder.replies")
     rag_pipeline.connect("retriever", "answer_builder.documents")
 
     return rag_pipeline
@@ -192,7 +192,7 @@ def save_test_data(test_questions, test_answers, embedding_model, generator_mode
     :param temperature: The temperature setting for the model.
     :param repeat_penalty: The repeat penalty setting for the model.
     """
-    filename = f"./test_data/test_data_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.json"
+    filename = f"./test_data/test_data.json"
 
     test_data = {
         'test_questions': test_questions, 
@@ -204,7 +204,7 @@ def save_test_data(test_questions, test_answers, embedding_model, generator_mode
         json.dump(test_data, f, indent = 4)
     
     print(f'Test data saved as {filename}')
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float, overwrite):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
@@ -232,6 +232,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                 ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
                 questions, test_questions = split_list_data(questions, val_ratio= 0.8, test_ratio= 0.2)
                 ground_truth_answers, test_answers = split_list_data(ground_truth_answers, val_ratio = 0.8, test_ratio = 0.2)
+                ground_truth_docs, test_docs = split_list_data(ground_truth_docs, val_ratio = 0.8, test_ratio = 0.2)
                 save_test_data(test_questions, test_answers, embedding_model, generator_model, temperature, repeat_penalty)
                 
                 results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
@@ -240,7 +241,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                 #rag_pipeline.graph._node["generator"]["instance"].model.close()
             except Exception as e:
                 # Log any errors
-                error_message = f"Error occurred for {embedding_model} and {generator_model}: {str(e)}"
+                error_message = f"Error occurred for {embedding_model} and {generator_model}: {traceback.format_exc(e)}"
                 print(error_message)
 
                 log_error_to_file(error_message)
@@ -270,11 +271,6 @@ if __name__ == "__main__":
     - Answer in multiple sentences.
     - Include irrelevant information.
 
-    For example:
-    - Question: What is the capital of France?
-    Answer: Paris. (Correct)
-    DO NOT ANSWER: Paris. What is the population of Paris? 2.1 million. (This is Incorrect)
-
     Context:
     {% for document in documents %}
         {{ document.content }}
@@ -283,4 +279,4 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=True)  
+    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=False)  
