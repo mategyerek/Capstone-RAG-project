@@ -90,3 +90,35 @@ def extract_document_contents(file_path):
                          for doc in data.get("documents", [])]
 
     return document_contents
+
+
+def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
+    """
+    Load embeddings and documents from a JSON file into an InMemoryDocumentStore.
+
+    :param file_path: Path to the JSON file containing the document store data.
+    :return: An initialized InMemoryDocumentStore with documents having embeddings.
+    """
+    document_store = InMemoryDocumentStore()
+
+    with open(file_path, "r") as file:
+        data = json.load(file)
+
+    documents = data.get("documents", [])
+    print(f"Number of documents in the JSON: {len(documents)}")
+
+    documents_with_embeddings = [
+        Document(
+            content=doc.get("content"),
+            embedding=doc.get("embedding"),
+            meta=doc.get("meta", {})
+        )
+        for doc in documents if "embedding" in doc
+    ]
+    print(f"Number of documents with embeddings: {
+          len(documents_with_embeddings)}")
+
+    # Write documents into the document store
+    document_store.write_documents(documents_with_embeddings)
+
+    return document_store
