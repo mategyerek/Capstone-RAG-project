@@ -6,6 +6,7 @@ from haystack.document_stores.types import DuplicatePolicy
 import pickle
 import os
 import json
+import random 
 
 
 def embed_documents(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
@@ -122,3 +123,16 @@ def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore
     document_store.write_documents(documents_with_embeddings)
 
     return document_store
+
+def split_list_data(data_list, val_ratio=0.8, test_ratio=0.2):
+    # Shuffle the data to ensure randomness
+    random.shuffle(data_list)
+
+    val_size = int(len(data_list) * val_ratio)
+    test_size = len(data_list) - val_size
+
+    val_data = data_list[:val_size]  # First 80% for validation
+    test_data = data_list[val_size:]  # Last 20% for testing
+
+    return val_data, test_data
+

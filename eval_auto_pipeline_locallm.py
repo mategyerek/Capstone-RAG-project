@@ -14,7 +14,7 @@ from haystack.components.embedders import SentenceTransformersTextEmbedder
 from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
-from embed_document import load_json_file, extract_document_contents, embed_documents_grouped, save_database_to_disk, load_document_store_with_embeddings
+from embed_document import load_json_file, extract_document_contents, embed_documents_grouped, save_database_to_disk, load_document_store_with_embeddings, split_list_data
 from custom_component import QuestionCutter
 import pandas as pd 
 from bert_score import score
@@ -181,6 +181,29 @@ def save_evaluation_results(results_df, embedding_model, generator_model, temper
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
+def save_test_data(test_questions, test_answers, embedding_model, generator_model, temperature, repeat_penalty):
+    """
+    Save the test questions and answers as a JSON file.
+
+    :param test_questions: The list of test questions.
+    :param test_answers: The list of test answers.
+    :param embedding_model: The name of the embedding model.
+    :param generator_model: The name of the generator model.
+    :param temperature: The temperature setting for the model.
+    :param repeat_penalty: The repeat penalty setting for the model.
+    """
+    filename = f"./test_data/test_data_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.json"
+
+    test_data = {
+        'test_questions': test_questions, 
+        'test_answers': test_answers
+    }
+
+    os.makedirs(os.path.dirname(filename), exist_ok= True)
+    with open(filename, 'w') as f: 
+        json.dump(test_data, f, indent = 4)
+    
+    print(f'Test data saved as {filename}')
 def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
@@ -207,6 +230,9 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                     lookup_table = json.load(f)
                 
                 ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
+                questions, test_questions = split_list_data(questions, val_ratio= 0.8, test_ratio= 0.2)
+                ground_truth_answers, test_answers = split_list_data(ground_truth_answers, val_ratio = 0.8, test_ratio = 0.2)
+                save_test_data(test_questions, test_answers, embedding_model, generator_model, temperature, repeat_penalty)
                 
                 results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
                 
