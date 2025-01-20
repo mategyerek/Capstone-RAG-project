@@ -181,11 +181,11 @@ def save_evaluation_results(results_df, embedding_model, generator_model, temper
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float, overwrite: bool):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
-                if check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
+                if not overwrite and check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
                     print(f"Results already exist for {embedding_model} and {generator_model}. Skipping...")
                     continue
 
@@ -232,13 +232,12 @@ if __name__ == "__main__":
     ]
     
     generator_models = [
-        "model_weights/Phi-3.5-mini-instruct-IQ3_XS.gguf",
-        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",  
         "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
+        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
     ]
     
-    prompt = """Given a context, provide ONLY the answers to the questions without repepating the question. 
+    prompt = """Given a context, provide ONLY the answers to the questions without repeating the question. 
     Keep the answers very short, only limiting yourself to directly answering the question.  
     DO NOT:
     - Generate multiple questions and answers.
@@ -258,4 +257,4 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 2)  
+    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=True)  
