@@ -14,8 +14,8 @@ from haystack.components.embedders import SentenceTransformersTextEmbedder
 from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
-from embed_document import load_json_file, extract_document_contents, embed_documents_grouped, save_database_to_disk
-from eval_pipeline import load_document_store_with_embeddings
+from embed_document import load_json_file, extract_document_contents, embed_documents_grouped, save_database_to_disk, load_document_store_with_embeddings
+from custom_component import QuestionCutter
 import pandas as pd 
 from bert_score import score
 import logging
@@ -67,7 +67,7 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
                                         model=generator_model,
                                         generation_kwargs={"temperature": temperature, "max_tokens": 128, "repeat_penalty": repeat_penalty},
                                         model_kwargs={"n_gpu_layers": -1})
-
+    question_cutter = QuestionCutter()
     # Initialize the pipeline
     rag_pipeline = Pipeline()
 
@@ -76,11 +76,13 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
     rag_pipeline.add_component("prompt_builder", prompt_builder)
     rag_pipeline.add_component("generator", chat_generator)
     rag_pipeline.add_component("answer_builder", AnswerBuilder())
+    rag_pipeline.add_component("question_cutter", question_cutter)
 
     rag_pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
     rag_pipeline.connect("retriever", "prompt_builder")
     rag_pipeline.connect("prompt_builder", "generator")
-    rag_pipeline.connect("generator.replies", "answer_builder.replies")
+    rag_pipeline.connect("generator.replies", "question_cutter.in_text")
+    rag_pipeline.connect("question_cutter.out_text", "answer_builder.replies")
     rag_pipeline.connect("retriever", "answer_builder.documents")
 
     return rag_pipeline
@@ -230,7 +232,7 @@ if __name__ == "__main__":
     ]
     
     generator_models = [
-        "model_weights/Phi-3.5-mini-instruct-Q5_K_S.gguf",
+        "model_weights/Phi-3.5-mini-instruct-IQ3_XS.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",  
         "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
