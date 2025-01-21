@@ -1,6 +1,7 @@
 from haystack.evaluation.eval_run_result import EvaluationRunResult
 from haystack_integrations.components.generators.llama_cpp import LlamaCppGenerator
 import os
+import numpy as np
 import json
 from haystack import Pipeline
 from haystack.components.builders import PromptBuilder, AnswerBuilder
@@ -202,71 +203,70 @@ def save_test_data(test_questions, test_answers):
         json.dump(test_data, f, indent = 4)
     
     print(f'Test data saved as {filename}')
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float, overwrite=False, test=False):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperatures: list[float], repeat_penalties: list[float], prompt: str, cut_question=True, overwrite=False, test=False):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
-            try:
-                if not overwrite and check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
-                    print(f"Results already exist for {embedding_model} and {generator_model}. Skipping...")
-                    continue
+            for temperature in temperatures:
+                for repeat_penalty in repeat_penalties:
+                    try:
+                        if not overwrite and check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
+                            print(f"Results already exist for {embedding_model} and {generator_model}. Skipping...")
+                            continue
 
-                # Embed documents only if results do not exist
-                doc_store_name = f"DocMerged_{embedding_model.replace('/', '_')}.json"
-                if os.path.exists(f'./data/{doc_store_name}'):
-                    print(f"Document store {doc_store_name} already exists. Skipping embedding step.")
-                else: 
-                    filtered_docs = embed_documents_grouped(embedding_model= embedding_model)
-                    save_database_to_disk(filtered_docs, path='./data', name=doc_store_name)
-                
-                rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty)
-                
-                questions = load_json_file('data/querys.json')
-                ground_truth_answers = load_json_file('data/answers.json')
-                all_documents = extract_document_contents(f'./data/{doc_store_name}')
-                
-                with open("./data/doc_lookup.json", "r") as f:
-                    lookup_table = json.load(f)
-                
-                ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
+                        # Embed documents only if results do not exist
+                        doc_store_name = f"DocMerged_{embedding_model.replace('/', '_')}.json"
+                        if os.path.exists(f'./data/{doc_store_name}'):
+                            print(f"Document store {doc_store_name} already exists. Skipping embedding step.")
+                        else: 
+                            filtered_docs = embed_documents_grouped(embedding_model= embedding_model)
+                            save_database_to_disk(filtered_docs, path='./data', name=doc_store_name)
+                        
+                        rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty, cut_question=cut_question)
+                        
+                        questions = load_json_file('data/querys.json')
+                        ground_truth_answers = load_json_file('data/answers.json')
+                        all_documents = extract_document_contents(f'./data/{doc_store_name}')
+                        
+                        with open("./data/doc_lookup.json", "r") as f:
+                            lookup_table = json.load(f)
+                        
+                        ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
 
-                questions, test_questions = split_list_data(questions, val_ratio= 0.8, test_ratio= 0.2)
-                ground_truth_answers, test_answers = split_list_data(ground_truth_answers, val_ratio = 0.8, test_ratio = 0.2)
-                ground_truth_docs, test_docs = split_list_data(ground_truth_docs, val_ratio = 0.8, test_ratio = 0.2)
-                if not test:
-                    save_test_data(test_questions, test_answers)
-                else:
-                    questions = test_questions
-                    ground_truth_answers = test_answers
-                    ground_truth_docs = test_docs
-                
-                results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
-                
-                save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty)
-                #rag_pipeline.graph._node["generator"]["instance"].model.close()
-            except Exception as e:
-                # Log any errors
-                error_message = f"Error occurred for {embedding_model} and {generator_model}: {traceback.format_exc(e)}"
-                print(error_message)
+                        questions, test_questions = split_list_data(questions, val_ratio= 0.8, test_ratio= 0.2)
+                        ground_truth_answers, test_answers = split_list_data(ground_truth_answers, val_ratio = 0.8, test_ratio = 0.2)
+                        ground_truth_docs, test_docs = split_list_data(ground_truth_docs, val_ratio = 0.8, test_ratio = 0.2)
+                        if not test:
+                            save_test_data(test_questions, test_answers)
+                        else:
+                            questions = test_questions
+                            ground_truth_answers = test_answers
+                            ground_truth_docs = test_docs
+                        
+                        results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
+                        
+                        save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty)
+                        #rag_pipeline.graph._node["generator"]["instance"].model.close()
+                    except Exception as e:
+                        # Log any errors
+                        error_message = f"Error occurred for {embedding_model} and {generator_model}: {traceback.format_exc(e)}"
+                        print(error_message)
 
-                log_error_to_file(error_message)
+                        log_error_to_file(error_message)
 
 if __name__ == "__main__":
     # Define your embedding and generator models here
     embedding_models = [
         # default: "sentence-transformers/all-MiniLM-L6-v2",
-        "multi-qa-mpnet-base-cos-v1", # (mean, 420MB)
-        "all-mpnet-base-v2", # performance (mean, 420MB)
+        #"multi-qa-mpnet-base-cos-v1", # (mean, 420MB)
+        #"all-mpnet-base-v2", # performance (mean, 420MB)
         "multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
-        "all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
-        "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
-        "sentence-transformers/nli-bert-base-max-pooling", # max pooling
+        #"all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
+        # "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
+        #"sentence-transformers/nli-bert-base-max-pooling", # max pooling
     ]
     
     generator_models = [
-        "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
-        "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",
-        "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
-        "model_weights/mistral-7b-v0.3-q5_k_m.gguf"
+        "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf"
     ]
     
     prompt = """Given a context, provide ONLY the answers to the questions without repeating the question. 
@@ -284,4 +284,8 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=False, test=False)  
+    ts = np.logspace(np.log10(0.1), np.log10(2), 6)
+
+    rps = [1, 1.5, 2]
+
+    run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=False)  
