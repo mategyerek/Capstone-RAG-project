@@ -14,7 +14,7 @@ from haystack.components.evaluators.document_mrr import DocumentMRREvaluator
 from haystack.components.evaluators.faithfulness import FaithfulnessEvaluator
 from haystack.components.evaluators.sas_evaluator import SASEvaluator
 from embed_document import load_json_file, extract_document_contents, embed_documents_grouped, save_database_to_disk
-from eval_pipeline import load_document_store_with_embeddings
+from embed_document import load_document_store_with_embeddings
 import pandas as pd 
 from bert_score import score
 import logging
@@ -93,7 +93,7 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
 
     return rag_pipeline
 
-def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs):
+def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs, visualise = True):
     """
     Evaluate the pipeline using several metrics.
 
@@ -107,6 +107,8 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
     eval_pipeline.add_component("doc_mrr_evaluator", DocumentMRREvaluator())
     eval_pipeline.add_component("faithfulness", FaithfulnessEvaluator())
     eval_pipeline.add_component("sas_evaluator", SASEvaluator(model="sentence-transformers/all-MiniLM-L6-v2"))
+    if visualise: 
+        eval_pipeline.draw(path = '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data/evalgraph.png')
 
     rag_answers = []
     retrieved_docs = []
@@ -186,7 +188,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model):
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
-def run_evaluation_for_models(embedding_models: list, generator_models: list):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, visualise = True):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
@@ -213,8 +215,11 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list):
                 
                 ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
                 
-                results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
-                
+                if visualise: 
+                    rag_pipeline.draw(path = '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data/pipegraph.png')
+
+                results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs, visualise= True)
+
                 save_evaluation_results(results_df, embedding_model, generator_model)
 
             except Exception as e:
@@ -227,15 +232,13 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list):
 if __name__ == "__main__":
     # Define your embedding and generator models here
     embedding_models = [
-        "sentence-transformers/nli-bert-base-max-pooling",  # Example model 1
-        "sentence-transformers/all-MiniLM-L6-v2",  # Example model 2
+        "multi-qa-mpnet-base-dot-v1",  # Example model 1 
         # Add more models as needed
         
     ]
     
     generator_models = [
         "mistralai/Mistral-7B-Instruct-v0.3",   
-        #Same thing
     ]
     
     run_evaluation_for_models(embedding_models, generator_models)  
