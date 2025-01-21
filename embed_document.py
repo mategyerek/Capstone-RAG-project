@@ -64,10 +64,6 @@ def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6
     return document_store
 
 
-filtered_docs = embed_documents_grouped()
-save_database_to_disk(filtered_docs, path='./data', name='DocMerged.json')
-
-
 def load_json_file(file_path: str) -> dict:
     """Reads a JSON file and returns its contents as a Python dictionary."""
     try:
@@ -137,3 +133,6 @@ def split_list_data(data_list, val_ratio=0.8, test_ratio=0.2, seed=42):
 
     return val_data, test_data
 
+if __name__ == "__main__":
+    filtered_docs = embed_documents_grouped()
+    save_database_to_disk(filtered_docs, path='./data', name='DocMerged.json')
