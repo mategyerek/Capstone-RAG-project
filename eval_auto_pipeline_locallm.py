@@ -32,7 +32,7 @@ def check_if_results_exist(embedding_model: str, generator_model: str, temperatu
     file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.csv"
     return os.path.exists(f'./results/{file_name}')
     
-def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5, cut_question=True):
+def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5, cut_question=False):
     """
     Create a pipeline dynamically with the given embedding model and generator model.
 
