@@ -32,7 +32,7 @@ def check_if_results_exist(embedding_model: str, generator_model: str, temperatu
     file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.csv"
     return os.path.exists(f'./results/{file_name}')
     
-def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5):
+def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5, cut_question=True):
     """
     Create a pipeline dynamically with the given embedding model and generator model.
 
@@ -60,9 +60,8 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
                                              api_params={"model": generator_model})"""
     chat_generator = LlamaCppGenerator(
                                         model=generator_model,
-                                        generation_kwargs={"temperature": temperature, "max_tokens": 128, "repeat_penalty": repeat_penalty},
+                                        generation_kwargs={"temperature": temperature, "max_tokens": 128, "repeat_penalty": repeat_penalty, "stop": ["Question:"] if cut_question else []},
                                         model_kwargs={"n_gpu_layers": -1})
-    question_cutter = QuestionCutter()
     # Initialize the pipeline
     rag_pipeline = Pipeline()
 
@@ -71,14 +70,18 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
     rag_pipeline.add_component("prompt_builder", prompt_builder)
     rag_pipeline.add_component("generator", chat_generator)
     rag_pipeline.add_component("answer_builder", AnswerBuilder())
-    #rag_pipeline.add_component("question_cutter", question_cutter)
+    if cut_question:
+        rag_pipeline.add_component("question_cutter", QuestionCutter())
 
     rag_pipeline.connect("text_embedder.embedding", "retriever.query_embedding")
     rag_pipeline.connect("retriever", "prompt_builder")
     rag_pipeline.connect("prompt_builder", "generator")
-    rag_pipeline.connect("generator.replies", "answer_builder.replies")
-    #rag_pipeline.connect("question_cutter.out_text", "answer_builder.replies")
     rag_pipeline.connect("retriever", "answer_builder.documents")
+    if cut_question:
+        rag_pipeline.connect("generator.replies", "question_cutter.in_text")
+        rag_pipeline.connect("question_cutter.out_text", "answer_builder.replies")
+    else:
+        rag_pipeline.connect("generator.replies", "answer_builder.replies")    
 
     return rag_pipeline
 
@@ -263,6 +266,7 @@ if __name__ == "__main__":
         "model_weights/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q3_K_L.gguf",
         "model_weights/Llama-3.2-3B-Instruct-Q6_K.gguf",
+        "model_weights/mistral-7b-v0.3-q5_k_m.gguf"
     ]
     
     prompt = """Given a context, provide ONLY the answers to the questions without repeating the question. 
