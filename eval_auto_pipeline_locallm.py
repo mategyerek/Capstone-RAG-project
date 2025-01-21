@@ -1,13 +1,8 @@
 from haystack.evaluation.eval_run_result import EvaluationRunResult
-from haystack import Document
-from haystack.document_stores.in_memory import InMemoryDocumentStore
 from haystack_integrations.components.generators.llama_cpp import LlamaCppGenerator
 import os
 import json
 from haystack import Pipeline
-from haystack.components.generators import HuggingFaceAPIGenerator
-import os
-from haystack.dataclasses import ChatMessage
 from haystack.components.builders import PromptBuilder, AnswerBuilder
 from haystack.components.retrievers.in_memory import InMemoryEmbeddingRetriever
 from haystack.components.embedders import SentenceTransformersTextEmbedder
@@ -181,7 +176,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model, temper
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
-def save_test_data(test_questions, test_answers, embedding_model, generator_model, temperature, repeat_penalty):
+def save_test_data(test_questions, test_answers):
     """
     Save the test questions and answers as a JSON file.
 
@@ -204,7 +199,7 @@ def save_test_data(test_questions, test_answers, embedding_model, generator_mode
         json.dump(test_data, f, indent = 4)
     
     print(f'Test data saved as {filename}')
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float, overwrite):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperature: float, prompt: str, repeat_penalty: float, overwrite=False, test=False):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             try:
@@ -230,10 +225,16 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                     lookup_table = json.load(f)
                 
                 ground_truth_docs = [all_documents[lookup_table.get(str(i))] for i in range(len(questions))]
+
                 questions, test_questions = split_list_data(questions, val_ratio= 0.8, test_ratio= 0.2)
                 ground_truth_answers, test_answers = split_list_data(ground_truth_answers, val_ratio = 0.8, test_ratio = 0.2)
                 ground_truth_docs, test_docs = split_list_data(ground_truth_docs, val_ratio = 0.8, test_ratio = 0.2)
-                save_test_data(test_questions, test_answers, embedding_model, generator_model, temperature, repeat_penalty)
+                if not test:
+                    save_test_data(test_questions, test_answers)
+                else:
+                    questions = test_questions
+                    ground_truth_answers = test_answers
+                    ground_truth_docs = test_docs
                 
                 results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
                 
@@ -255,7 +256,7 @@ if __name__ == "__main__":
         "multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
         "all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
         "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
-        "sentence-transformers/nli-bert-base-max-pooling", 
+        "sentence-transformers/nli-bert-base-max-pooling", # max pooling
     ]
     
     generator_models = [
@@ -279,4 +280,4 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=False)  
+    run_evaluation_for_models(embedding_models, generator_models, temperature= 2, prompt = prompt, repeat_penalty= 1.5, overwrite=False, test=False)  
