@@ -25,18 +25,16 @@ pip install llama-cpp-haystack --upgrade --force-reinstall --no-cache-dir
 Note that if you try this on Windows you will probably get an [error](https://github.com/abetlen/llama-cpp-python/issues/721#issuecomment-1723892241).
 
 ### Downloading models
-Id you would like to run inference, the model weights need to be downloaded from huggingface (the models are several GB each, you can choose to omit any of them just make sure to exclude them from the parameter search). In our study the following models were used:
-<code>
-https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf
+If you would like to run inference, the model weights need to be downloaded from huggingface (the models are several GB each, you can choose to omit any of them just make sure to exclude them from the parameter search). In our study the following models were used:
+<code>https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf
 https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q6_K.gguf
 https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q3_K_L.gguf
-https://huggingface.co/S10244414/Mistral-7B-v0.3-Q5_K_M-GGUF/resolve/main/mistral-7b-v0.3-q5_k_m.gguf
-</code>
+https://huggingface.co/S10244414/Mistral-7B-v0.3-Q5_K_M-GGUF/resolve/main/mistral-7b-v0.3-q5_k_m.gguf</code>
 The downloaded files should be placed in `Capstone-RAG-project/model_weights`
 
 ### Running the code
 After completing the steps above, you can run the code. Run the `querydata.py` to extract the relevant part of the data from the raw data. Then run `embed_document.py` to embed the documents.
-You can run `NO-RAG Chat.py` to get the baseline performance from Chatgpt-4o. The API key included in source should work, but if it does not, generate your own openAI API key.
+You can run `NO-RAG Chat.py` to get the baseline performance from Chatgpt-4o. The API key included in source should work, but if it does not, generate your own OpenAI API key.
 You can run `eval_auto_pipeline_locallm.py` to evaluate a combination of LLM and embedding model or do a parameter search across multiple ones. Note that this will take a long time especially if its running on the CPU. For the parameter search you have to specify the list of embedding models and LLMs in source. The embedding models are loaded automatically but the LLM's .gguf file should be manually downloaded as described above.
 The parameters for the run need to be changed in source. Adjust the variables `embedding_models`, `generator_models`, `temperature` and `repeat_penalty` to reproduce specific runs. Set `test` to true if you want data on the test set. All the results are placed in the results folder.
 
