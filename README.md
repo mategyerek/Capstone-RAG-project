@@ -40,7 +40,20 @@ The parameters for the run need to be changed in source. Adjust the variables `e
 
 Finally, run the Data Analysis Notebook to produce the plots from the data.
 ## Description of program structure and design choices
+The following part gives an overview of our approach and process. It is not needed to reproduce the results, only to get a deeper understanding of the code.
 ### File structure
+The project is structured as follows. In the root folder we have all the python files:
+`after_processing.py` - A temporary solution to remove hallucinations from the LLM answers after they have been generated. Not used anymore.
+`chat_pipeline.py` - Used to generate RAG answers using the GPT4o mini. Handy to create example answers quickly, but does not include an evaluation.
+`custom_component.py` - Our custom haystack component to remove hallucinations in the main pipeline
+`Data Analysis Notebook.ipynb` - Jupyter notebook to visualize results. Does not generate the results by itself, only reads csv-s in results folders.
+`embed_document.py` - Embeds the document database. Includes utility functions to load and save the database in `data/`
+`eval_auto_pipeline_locallm.py` - Runs and evaluates the main pipeline using local LLM inference. Can be used for parameter optimization. Saves results into the results folder.
+`eval_auto_pipeline.py` - Somewhat deprecated but still functional version of `eval_auto_pipeline_locallm.py`. Instead of local LLM inference, it uses Huggingface API calls.
+`inspect_object.py` - Inspect a pickled object for debugging.
+`No_RAG_Chat.py` - Used to generate and evaluate answers by calling ChatGPT without RAG. Its results used as a baseline.
+`querydata.py` - Initial preprocessing of the data. Takes the relevant fields (query, answer, text_content) from the provided `.parquet˛` files, merges tex chunks related to the same document together and saves the data in `.json` format into `data/` for further processing.
 ### Choice of framework
+
 ### Main difficulties and solutions
 ### Limitations of the design
