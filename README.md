@@ -15,17 +15,18 @@ This should take care of the basic setup, but if any modules are missing just in
 To run the LLM inference locally, you need to have a GPU available. Beware that the following setup was only tested on Ubuntu 22.04.5 LTS and an nvidia GPU with compute capability 7.5. If you have different os or hardware you might have to deviate from these steps.
 
 You need to have the cuda drivers and cuda toolkit installed and working (setup tested with version 12.1). If you have multiple versions make sure to have the correct one selected by running `nvcc --version`. To select another version run
-
-<code>export PATH=/usr/local/cuda-12.1/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH</code>
-
+```bash session
+export PATH=/usr/local/cuda-12.1/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH
+```
 Then to install the required packages with CUDA, run:
 
-<code>export GGML_CUDA=1
+```bash session
+export GGML_CUDA=1
 CMAKE_ARGS="-DGGML_CUDA=on"
 pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
-pip install llama-cpp-haystack --upgrade --force-reinstall --no-cache-dir</code>
-
+pip install llama-cpp-haystack --upgrade --force-reinstall --no-cache-dir
+```
 Note that if you try this on Windows you will probably get an [error](https://github.com/abetlen/llama-cpp-python/issues/721#issuecomment-1723892241). In this case I recommend trying a to use a pre-built wheel for your cuda version (something like `pip install -r requirements.txt --force-reinstall --no-cache-dir --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/<cuda-version> --only-binary=llama-cpp-python`), but I haven't tried this so no guarantees.
 
 ### Downloading models
@@ -40,7 +41,7 @@ The downloaded files should be placed in `Capstone-RAG-project/model_weights`
 
 ### Running the code
 After completing the steps above, you can run the code. Run the `querydata.py` to extract the relevant part of the data from the raw data. Then run `embed_document.py` to embed the documents.
-You can run `NO-RAG Chat.py` to get the baseline performance from Chatgpt-4o. The API key included in source should work, but if it does not, generate your own OpenAI API key.
+You can run `NO-RAG Chat.py` to get the baseline performance from GPT-4o. The API key included in source should work, but if it does not, generate your own OpenAI API key.
 You can run `eval_auto_pipeline_locallm.py` to evaluate a combination of LLM and embedding model or do a parameter search across multiple ones. Note that this will take a long time especially if its running on the CPU. For the parameter search you have to specify the list of embedding models and LLMs in source. The embedding models are loaded automatically but the LLM's .gguf file should be manually downloaded as described above.
 The parameters for the run need to be changed in source. Adjust the variables `embedding_models`, `generator_models`, `temperature` and `repeat_penalty` to reproduce specific runs. Set `test` to true if you want data on the test set. All the results are placed in the results folder.
 
@@ -65,7 +66,7 @@ The project is structured as follows. In the root folder we have all the python 
 
 * `inspect_object.py` - Inspect a pickled object for debugging.
 
-* `No_RAG_Chat.py` - Used to generate and evaluate answers by calling ChatGPT without RAG. Its results used as a baseline.
+* `No_RAG_Chat.py` - Used to generate and evaluate answers by calling GPT-4o without RAG. Its results used as a baseline.
 
 * `querydata.py` - Initial preprocessing of the data. Takes the relevant fields (query, answer, text_content) from the provided `.parquet˛` files, merges tex chunks related to the same document together and saves the data in `.json` format into `data/` for further processing.
 
