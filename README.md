@@ -6,7 +6,7 @@ This section will describe how to reproduce the results in our presentation. To 
 ### Setting up the environment
 Clone this repository (please make sure to not commit anything, as you can only have read-write access).
 
-Make sure to use python 3.12. Run `pip install -r requirements.txt --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu --only-binary=llama-cpp-python` to install all the required modules. If there is no pre-built llama-cpp-python wheel compatible with your hardware this will fail. In this case resort to the [llama-cpp-python documentation](https://github.com/abetlen/llama-cpp-python/tree/main?tab=readme-ov-file#installation-configuration) for installing llama-cpp-python. Install the rest of the packages from the requirements.
+Make sure to use python 3.12. Run `pip install -r requirements.txt --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu --only-binary=llama-cpp-python` to install all the required modules. If there is no pre-built llama-cpp-python wheel compatible with your hardware this will fail. In this case resort to the [llama-cpp-python documentation](https://github.com/abetlen/llama-cpp-python/tree/main?tab=readme-ov-file#installation-configuration) for installing llama-cpp-python and install the rest of the packages from the requirements.
 
 Download the data from https://huggingface.co/datasets/vidore/syntheticDocQA_energy_test_ocr_chunk/tree/main. Place the contents (`test-00000-of-00002.parquet` and `test-00000-of-00002.parquet`) into `Capstone-RAG-project/data`.
 
