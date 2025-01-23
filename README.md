@@ -85,9 +85,9 @@ The folders are used as follows:
 There are some additional files for the environment configuration as well as this README.
 
 ### Choice of framework
-Ads our main NLP framework we choose [Haystack](https://docs.haystack.deepset.ai/docs/intro) by Deepset AI. This is a high-level framework based on the [transformers](https://pypi.org/project/transformers/) library. Haystack was the ideal choice for us, because it has a very good abstractions for quickly creating and iterationg on modular pipelines, which was essential to reach outr requirements.
+Ads our main NLP framework we choose [Haystack](https://docs.haystack.deepset.ai/docs/intro) by Deepset AI. This is a high-level framework based on the [transformers](https://pypi.org/project/transformers/) library. Haystack was the ideal choice for us, because it has a very good abstractions for quickly creating and iterationg on modular pipelines, which was essential to reach our requirements.
 
-For local inference we decided to use llamacpp, because we were vram constrained. Llamacpp it allows loading only part of the model into vram, while still efficiently utilizing the GPU. Moreover it is very easy to use with the quantized .gguf files available on huggingfacce for a large selection of models.
+For local inference we decided to use LlamaCpp, because we were vram constrained. LlamaCpp it allows loading only part of the model into vram, while still efficiently utilizing the GPU. Moreover it is very easy to use with the quantized .gguf files available on huggingfacce for a large selection of models.
 
 The rest of the packages we used are pretty standard, like pandas and numpy for basic data manipulation. These were chosen because they are easy to use and well-supported.
 
