@@ -16,21 +16,17 @@ To run the LLM inference locally, you need to have a GPU available. Beware that 
 
 You need to have the cuda drivers and cuda toolkit installed and working (setup tested with version 12.1). If you have multiple versions make sure to have the correct one selected by running `nvcc --version`. To select another version run
 
-<code>
-export PATH=/usr/local/cuda-12.1/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH
-</code>
+<code>export PATH=/usr/local/cuda-12.1/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:$LD_LIBRARY_PATH</code>
 
 Then to install the required packages with CUDA, run:
 
-<code>
-export GGML_CUDA=1
+<code>export GGML_CUDA=1
 CMAKE_ARGS="-DGGML_CUDA=on"
 pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
-pip install llama-cpp-haystack --upgrade --force-reinstall --no-cache-dir
-</code>
+pip install llama-cpp-haystack --upgrade --force-reinstall --no-cache-dir</code>
 
-Note that if you try this on Windows you will probably get an [error](https://github.com/abetlen/llama-cpp-python/issues/721#issuecomment-1723892241). In this case I recommend trying a to use a pre-built wheel for your cuda version (something like `pip install -r requirements.txt --force-reinstall --no-chache-dir --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/<cuda-version> --only-binary=llama-cpp-python`), but I haven't tried this so no guarantees.
+Note that if you try this on Windows you will probably get an [error](https://github.com/abetlen/llama-cpp-python/issues/721#issuecomment-1723892241). In this case I recommend trying a to use a pre-built wheel for your cuda version (something like `pip install -r requirements.txt --force-reinstall --no-cache-dir --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/<cuda-version> --only-binary=llama-cpp-python`), but I haven't tried this so no guarantees.
 
 ### Downloading models
 If you would like to run inference, the model weights need to be downloaded from huggingface (the models are several GB each, you can choose to omit any of them just make sure to exclude them from the parameter search). In our study the following models were used:
