@@ -28,16 +28,16 @@ if __name__ == "__main__":
         model=embedding_model)
 
 
-    template = [ChatMessage.from_user("""
-    Answer this question by following the format from this example:     
-        Question: What types of road improvements are planned for Greenmount Road in Belleville, Illinois? 
-        Answer: Additional lanes, standard overlay, bridge replacement. 
-    Keep the answer short, no additional informaiton.     
+    template = [ChatMessage.from_user("""Provide ONLY the answers to the questions without repeating the question. 
+    Keep the answers very short, only limiting yourself to directly answering the question.  
+    DO NOT:
+    - Generate multiple questions and answers.
+    - Answer in multiple sentences.
+    - Include irrelevant information.
 
 
     Question: {{question}}
-    Answer:                                        
-    """)]
+    Answer: """)]
 
 
     prompt_builder = ChatPromptBuilder(template=template)

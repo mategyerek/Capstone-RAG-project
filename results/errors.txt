@@ -1,0 +1,8 @@
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: 'data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: 'data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: 'data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: 'data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project/data'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project'
+Error occurred for multi-qa-mpnet-base-dot-v1 and mistralai/Mistral-7B-Instruct-v0.3: [Errno 21] Is a directory: '/Users/stefanbozhilov/Documents/GitHub/Capstone-RAG-project'
