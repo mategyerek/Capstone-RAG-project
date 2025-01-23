@@ -1,3 +1,8 @@
+"""
+This was used to remove hallucinations from old results.
+Deprecated, no need to run.
+"""
+
 import os
 import pandas as pd
 from haystack import Pipeline

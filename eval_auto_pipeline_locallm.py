@@ -1,7 +1,11 @@
+"""
+Run this to evaluate the final model or to perform a hyperparameter search. Adjust parameters at the bottom.
+Can only be run after querydata.py
+"""
+
 from haystack.evaluation.eval_run_result import EvaluationRunResult
 from haystack_integrations.components.generators.llama_cpp import LlamaCppGenerator
 import os
-import numpy as np
 import json
 from haystack import Pipeline
 from haystack.components.builders import PromptBuilder, AnswerBuilder
