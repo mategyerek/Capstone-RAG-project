@@ -1,5 +1,5 @@
 # Capstone group 6 code documentation
-This file serves as a documentation for the project Leveraging Large Language Models for Policy Document Retrieval information in Energy Renovations. The project is part of the Capstone course for the engineering with AI minor at the TU Delft.
+This file serves as a documentation for the project Leveraging Large Language Models for Policy Document Retrieval information in Energy Renovations. The project is part of the Capstone course for the Engineering with AI minor at the TU Delft.
 ## Steps to reproduce results
 This section will describe how to reproduce the results in our presentation. To run the more demanding parts in a reasonable time, GPU inference is recommended which requires special setup and hardware.
 
@@ -85,23 +85,25 @@ The folders are used as follows:
 There are some additional files for the environment configuration as well as this README.
 
 ### Choice of framework
-Ads our main NLP framework we choose [Haystack](https://docs.haystack.deepset.ai/docs/intro) by Deepset AI. This is a high-level framework based on the [transformers](https://pypi.org/project/transformers/) library. Haystack was the ideal choice for us, because it has a very good abstractions for quickly creating and iterationg on modular pipelines, which was essential to reach our requirements.
+As our main NLP framework we choose [Haystack](https://docs.haystack.deepset.ai/docs/intro) by Deepset AI. This is a high-level framework based on the [transformers](https://pypi.org/project/transformers/) library. Haystack was the ideal choice for us, because it has very good abstractions for quickly creating and iterationg on modular pipelines, which was essential to reach our requirements.
 
-For local inference we decided to use LlamaCpp, because we were vram constrained. LlamaCpp it allows loading only part of the model into vram, while still efficiently utilizing the GPU. Moreover it is very easy to use with the quantized .gguf files available on huggingfacce for a large selection of models.
+For local inference we decided to use LlamaCpp, because we were VRAM constrained. LlamaCpp only allows loading part of the model into VRAM, while still efficiently utilizing the GPU. Moreover it is very easy to use with the quantized .gguf files available on huggingfacce for a large selection of models.
 
 The rest of the packages we used are pretty standard, like pandas and numpy for basic data manipulation. These were chosen because they are easy to use and well-supported.
 
 ### Main difficulties and solutions
-During the coding we encountered a number of problems. When we wanted to merge text chunks by document, we ran into the error of duplicated documents (because now multiple questions ha the exact same document belonging to them). When embedding these documents we simply skipped the duplicates, however by doing this we lost the information about which question is paired to which document. This was later resolved by creating a dictionary in `querydata.py` storing these relationships.
+During the coding we encountered a number of problems. When we wanted to merge text chunks by document, we ran into the error of duplicated documents (because now multiple questions had the exact same document associated with them). When embedding these documents we simply skipped the duplicates, however by doing this we lost the information about which question is paired to which document. This was later resolved by creating a dictionary in `querydata.py` storing these relationships.
 
 We decided to limit our runs to local inference to force ourselves to use less resources, thus making our solution more sustainable. However, it was not easy to install llama-cpp-python with CUDA support as it would not use the GPU or on even break during installation. To fix the latter, we changed to using Linux, fixing the former led us to discover an error in [haystack documentation](https://docs.haystack.deepset.ai/docs/llamacppgenerator) about setting the right environment variables that is now patched thanks to our contribution.
 
-When we got the pipeline working we discovered that the LMM was hallucinating a lot, almost always follow up questions and answers. As these always adhered to the same format we just instructed the LLM to stop generating after the string "Question:". This did not only improve our results a lot, but also sped up the runtime slightly.
+When we got the pipeline working we discovered that the LLMs were hallucinating a lot, almost always following up with more questions and answers. As these always adhered to the same format we just instructed the LLM to stop generating after the string "Question:". This did not only improve our results a lot, but also sped up the runtime slightly.
 
 ### Limitations of the design
 
 The main performance limitations of the currant pipeline unfortunately is the data itself. The text-content chunks were extracted by OCR (Optical Character Recognition) and sometimes crucial information is missing or the extracted data is unintelligible. This could be fixed by using the PDF-s directly, like more advanced [ColPali](https://arxiv.org/abs/2407.01449). However as seen in the paper, running (and training) a vision LLM uses much more resurces than our solution.
 
 Another limitation stems from using the Haystack framework. Haystack's Document object, thats used to store our documents and embeddings is non-serializable, therefore we can not parallelize our pipeline to process multiple queries at once. This might soon be fixed by the introduction of [async pipelines](https://github.com/deepset-ai/haystack/issues/6012).
+
+Additionally, our design relies on a [InMemoryDocumentStore](https://docs.haystack.deepset.ai/docs/inmemorydocumentstore), which is a simple Haystack document store with no extra dependencies. This was suitable for our project, as it requires no external setup and works for rapid prototyping. However, this limits the capability and reliability of our pipeline. The scalability of is hardware constrained, no multi-user support is capable and lacks more advanced feature like advanced indexing mechanisms. Therefore, a better back-end is advised for production.
 
 Lastly, we are of course limited by LLM performance. The small quantized models we managed to run do not reach the quality of full-size SOTA LLMs like GPT4 or R1. However, in return our pipeline can run on a personal computer, as opposed to million-dollar servers.
