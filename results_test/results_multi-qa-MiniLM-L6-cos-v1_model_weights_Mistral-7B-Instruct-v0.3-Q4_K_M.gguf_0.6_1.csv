@@ -1,0 +1,112 @@
+question,contexts,answer,predicted_answer,doc_mrr_evaluator,faithfulness,sas_evaluator,precision,recall,f1
+What types of accounts or products allow investors to defer paying taxes?,"[Document(id=3cdb30149f14285f4ac44c5a736db9f6e1148919f9a4c899a98115b2fc5d07f9, content: 'TAX EFFICIENCY
+
+Y)
+
+The overall
+
+impact taxes on performance is significant: Morningstar cites that,...')]","['401(k) and 403(b) plans', 'IRAs', 'health savings accounts (HSAs)', 'other tax-deferred products such as deferred annuities']","401(k), 403(b), IRAs, HSAs, and other tax-deferred products such as deferred annuities.",1.0,0.0,0.8671426177024841,tensor(0.9386),tensor(0.9040),tensor(0.9210)
+What are the major greenhouse gases mentioned in the table?,"[Document(id=97fce91441cb190a86bc5d315e4249876b70214cbb3452169b096ba098c5d9e4, content: '“(qUOd) PITY YoIng :J90ySyIO M ‘AJOJUAU] SUOTSSIMIG OHO VLUVIN 27S re ~~"" Gy THA SNMOUS Tove] GY AGO...')]","['CO2', 'CH4', 'N2O', 'HFCs', 'PFCs', 'SF6', 'NF3']","13,548, 2,009, 8,588, 18,397, 37,750, 18,332, 4,373, 369, 103,666, 16,011, 2,822, 9,814, 21,157, 43,795, 21,281, 3,940, 243, 119",0.0,0.0,0.2893606126308441,tensor(0.7551),tensor(0.7652),tensor(0.7601)
+What criteria does NERC's standard BAL-003-1 establish?,"[Document(id=66620ade4dde9d9557bf1ab9a84a9959877d3f7308d2f1532b533114430acda5, content: '13 Accurate Method for Real-Time Power Reserve Estimation for Utility-Scale PV Power Plant
+
+13.1Impo...')]","[""NERC's standard BAL-003-1, Frequency Response and Frequency Bias Setting, establishes target contingency protection criteria for each North American interconnection and individual balancing authorities within interconnections""]", Target contingency protection criteria for each North American interconnection and individual balancing authorities within interconnections.,1.0,0.0,0.8126267194747925,tensor(0.9694),tensor(0.8799),tensor(0.9225)
+What are the different regional and subregional plans mentioned for the San Diego region?,"[Document(id=dd917da0268ee0dc273c2f4fe9ec9f4a236b72aee5ef6b19c350e6793ffd5d30, content: 'Collaborative Planning for Climate Resilience
+
+relations between tribes and regional planning agenci...')]","['San Diego County Multi-jurisdictional Hazard Mitigation Plan (MHMP) and Local Hazard Mitigation Plans', 'San Diego Forward: The Regional Plan (RTP/SCS)', 'Regional and Subregional Water Quality Plans: Water Quality Control Plan for the San Diego Basin (Basin Plan), Watershed Management Area Water Quality Improvement Plans (WQIPs)', 'Urban Water Management Plan (UWMP)', 'Regional and Subregional Habitat Conservation Programs: San Diego Multiple Species Conservation Program (MSCP), MSCP Subregional Planning Area Programs', 'San Diego County Climate Change and Public Health Plan', 'San Diego Port Master Plan']","1. San Diego County Multi-jurisdictional Hazard Mitigation Plan (MJHMP) and Local Hazard Mitigation Plans
+      2. San Diego Forward: The Regional Plan (RTP/SCS)
+      3. Regional and Subregional Water Quality Plans (Water Quality Control Plan for the San Diego Basin (Basin Plan), Watershed Management Area Water Quality Improvement Plans (WQIPs))
+      4. Urban Water Management Plan (UWMP)
+      5. Regional and Subregional Habitat Conservation Programs (San Diego Mult",1.0,0.0,0.900659441947937,tensor(0.8967),tensor(0.9294),tensor(0.9128)
+What is the name of the institute where Andrei Vladescu works?,"[Document(id=bfad6e9945055bd7bd4a441dfb728bcace91bcb56ca5e82f8c2d52963886dcad, content: 'Tamari, A. Todorov, T. Twardy, L. Urbancic, A. Viadescu, A. Ministry of Energy 216, Jaffa Street P.O...')]",['Romanian Electricity Company - CONEL']," Energy Efficiency Centre ""Jozef Stefan"" Institute",1.0,0.0,0.4515252709388733,tensor(0.8061),tensor(0.8030),tensor(0.8045)
+What are some potential vulnerabilities of underground nuclear power plants?,"[Document(id=4a2898531fc133b3838e33341136891bb2e144646b4da28f12d538d6653fa52a, content: '‘The Future of Nuclear Power in the United States
+
+February 2012
+
+tance to assaults and accidents. A...')]","['vulnerability to extreme seismic events', 'possibility of releases from a reactor meltdown']","1. Large inertial masses associated with underground containments may not be moved by a meltdown of a reactor.
+          2. Extreme seismic events would need careful assessment.",1.0,0.0,0.6420609951019287,tensor(0.8180),tensor(0.8695),tensor(0.8430)
+How does the United Kingdom's electricity grid differ from the United States according to the passage?,"[Document(id=125578a7afa39b92ff0254facb39abd3ebdfdd799f0b136d267fa20ef9630693, content: '9. KlassWilson_PAGE (Do Not Delete)
+
+11/16/2012 11:24 AM
+
+2012] INTERSTATE TRANSMISSION CHALLENGES 1...')]","['The United Kingdom has only one grid, and one owner', 'The United States has eight or ten grids, eight or ten large regional machines that have scores or hundreds of owners']","1. UK has only one grid, and one owner.
+       2. US has multiple grids, multiple large regional machines, and many owners.",1.0,0.0,0.8427980542182922,tensor(0.8864),tensor(0.8974),tensor(0.8919)
+Which hour of the day had the highest overall electricity generation in 2019?,"[Document(id=8c05d858e7d1f0264b5f15968d1ebbaa8361340c2f43b30c33ada08a49566945, content: '2019 Average Hourly Generation by Fuel Type
+
+35,000 |Nuclear Bio Geothermal “Solar Wind mHydro mNatu...')]",['Hour 20'],"24 Hours
+
+    ",1.0,0.0,0.49465030431747437,tensor(0.8597),tensor(0.8224),tensor(0.8406)
+At what temperature and pressure conditions is the reaction vessel maintained?,"[Document(id=c5cc11a090f41209a8d6e922e80f4271c527784b368577aa59b51cdee8e5f84b, content: '352
+
+CHAPTER 14. Chemical-Reaction Equilibria
+
+in which case the AG® value is for mixed standard sta...')]",['200°C and 34.5 bar'], Temperature and pressure conditions are not specified in the provided context.,0.0,1.0,0.406180739402771,tensor(0.8196),tensor(0.8051),tensor(0.8123)
+What is the mission of the Bioenergy Technologies Office (BETO)?,"[Document(id=67c2ec1ae949ad5700cbbf362e3c1be35a51e18d46a13c98ad4da996704bb9da, content: 'Sustainable Aviation Fuel: Review of Technical Pathways
+
+Appendix 1. Bioenergy Technologies Office M...')]","['To develop industrially relevant, transformative, and revolutionary bioenergy technologies to enable sustainable, domestically produced biofuels, bioproducts, and biopower for a prosperous nation']"," Develop industrially relevant, transformative, and revolutionary bioenergy technologies to enable sustainable, domestically produced biofuels, bioproducts, and biopower for a prosperous nation.
+
+    ",1.0,0.0,0.8969060182571411,tensor(0.9744),tensor(0.9650),tensor(0.9697)
+"What is the lobbyist income reported for Amelia B McKie during the period from January 1 to May 31, 2018?","[Document(id=41ebbe588f93d908bfcc197e473015b68b9c8a38d776e98d91913894b53e8c32, content: 'Lobbying Activity - Public Reporting - SC State Ethics Commission
+
+Page | of 2
+
+SC.GV The Official W...')]","['$2,500.00']","2,500.00
+
+    ",1.0,0.0,0.7390474677085876,tensor(0.9544),tensor(0.9001),tensor(0.9265)
+What is the purpose of a configuration footprint in the Staged Project Delivery Process?,"[Document(id=e32c906c60f70231b5fe78f990215a055de1dffc988a5e28e3273615b87f4ea9, content: 'CHAPTER 1: STEPS TO GETTING TRAINS RUNNING IN CALIFORNIA
+
+What Is a Configuration Footprint?
+
+Consis...')]","['Map the initial right of way necessary to construct a project', 'Identify utility relocation requirements', 'Develop third-party agreements', 'Initiate requests for environmental permits']","1. Map initial right of way. 2. Identify utility relocation requirements. 3. Develop third-party agreements. 4. Initiate requests for environmental permits. 5. Refine cost estimates, assess risk and benefits, and make procurement decisions.",1.0,0.0,0.9100167751312256,tensor(0.9081),tensor(0.9145),tensor(0.9113)
+What are the nodes and links in a power grid graph representation?,"[Document(id=ccf2d85079b5846dfe12ec7e5d227829517695910fb272b806926e1f085b1ff0, content: 'Power Grid Graph Representation
+
+Nodes: Buses
+
+Links: Transmission Lines
+
+Load
+
+Generator
+
+Dr. Hamed...')]","['Nodes: Buses', 'Links: Transmission Lines']","1) Nodes: Buses
+          2) Links: Transmission Lines",1.0,1.0,0.8842049837112427,tensor(0.8091),tensor(0.9052),tensor(0.8545)
+What criteria should a heat exchanger satisfy for thermal energy storage in solar and low energy buildings?,"[Document(id=cf26033201d67627e6103e0a7072ebea2da0f54d7279fb8af9c2fbfef8ed13d0, content: 'IEA SHC Task 32 “Advanced storage concepts for solar and low energy buildings” - State of the
+
+art
+
+...')]","['Rating (max power in and out)', 'Hydraulic head losses (should be in accordance with the pump capabilities)', 'Cost (it is always an optimisation parameter)']","1. Rating (max power in and out)
+   2. Hydraulic head losses (should be in accordance with the pump capabilities)
+   3. Cost (optimization parameter)",1.0,0.0,0.8664124011993408,tensor(0.9090),tensor(0.9094),tensor(0.9092)
+What percentage of workers had a commute time of 15-29 minutes in 1990?,"[Document(id=d43056853367dc1b5f164e8f3e1cfe548f21cc9dbc7381dd6637c1be5e115863, content: '8-22
+
+A
+
+The average commute time increased to 25.3 minutes in 2011. Two thirds of workers travel le...')]",['51.6%'],"51.6%
+
+    ",1.0,0.0,0.8458975553512573,tensor(0.9519),tensor(0.8960),tensor(0.9231)
+What was the average annual percent change in ton-miles for all modes of transportation between 1997 and 2007?,"[Document(id=cfda495d08550cdd689d57fea5aee07d19175940acfa5a1e6ea6f59b11dbe138, content: '5-23
+
+Industries covered by the 2007 Commodity Flow Survey (CFS) accounted for 3.3 trillion ton-mile...')]",['2.3%'],"2.3%
+
+    ",1.0,0.0,0.7803972363471985,tensor(0.9591),tensor(0.9123),tensor(0.9351)
+What industry does Servico cater to?,"[Document(id=55daf577fbac2b3ba5aa6e6df0a12d3d19a1fec21038c89f46866ec824087c4f, content: 'SOFTWARE INSIGHT
+
+March 2024
+
+Selected Recent Strategic Buyer M&A and Investment Activity
+
+Vertical ...')]",['Restaurant & Hospitality']," Not specified in context.
+
+    ",0.0,1.0,0.22191815078258514,tensor(0.8118),tensor(0.7925),tensor(0.8020)
+What is the importance of accurate estimation of available PV power according to the text?,"[Document(id=66620ade4dde9d9557bf1ab9a84a9959877d3f7308d2f1532b533114430acda5, content: '13 Accurate Method for Real-Time Power Reserve Estimation for Utility-Scale PV Power Plant
+
+13.1Impo...')]","['All around the world, system operators and utilities are continually adapting their grid codes, interconnection requirements, operational practices, and market mechanisms to make the integration of shares of fast-growing variable renewable generation both reliable and economic']"," It minimizes grid impacts from variability and improves reliability, stability, and power quality.",0.0,1.0,0.6110895872116089,tensor(0.8900),tensor(0.8497),tensor(0.8694)
+Who is the Governmental Affairs Agent listed on Schedule F - Travel/Lodging?,"[Document(id=5e2ca319ccb581167f7e2d97163909573cd36e8fe9131987d30eb82f09b96890, content: 'SCHEDULE E - COMMUNICATION EXPENSES
+
+PURPOSE: 1° report the costs of the preparation and distributio...')]",['David B. Applebaum']," David B. Applebaum
+
+    ",1.0,0.0,0.8075693249702454,tensor(0.9190),tensor(0.8897),tensor(0.9041)
+What was the cause of the Chernobyl nuclear accident?,"[Document(id=03826d818e5437238632755667b0a61b6e0ebb0c33171a33df49641ae5975779, content: 'NUCLEAR FISSION — 253
+
+What Happened at Chernobyl?
+
+In comparison with the accident at Three Mile Is...')]",['unauthorized experimentation with the reactor'], Unauthorized experimentation with the reactor.,1.0,0.0,0.9155758619308472,tensor(0.9580),tensor(0.9142),tensor(0.9356)
