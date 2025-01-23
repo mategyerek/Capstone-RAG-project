@@ -261,7 +261,7 @@ if __name__ == "__main__":
         #"all-mpnet-base-v2", # performance (mean, 420MB)
         "multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
         #"all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
-        # "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
+        "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
         #"sentence-transformers/nli-bert-base-max-pooling", # max pooling
     ]
     
@@ -284,8 +284,8 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
-    ts = np.logspace(np.log10(0.1), np.log10(2), 6)
+    ts = [0.6]
 
-    rps = [1, 1.5, 2]
+    rps = [1]
 
-    run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=False)  
+    run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=True)  
