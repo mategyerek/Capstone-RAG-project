@@ -29,11 +29,11 @@ def log_error_to_file(error_message: str):
     with open(error_log_file, 'a') as f:
         f.write(f"{error_message}\n")
 
-def check_if_results_exist(embedding_model: str, generator_model: str, temperature, repeat_penalty) -> bool:
-    file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}.csv"
+def check_if_results_exist(embedding_model: str, generator_model: str, temperature, repeat_penalty, similarity) -> bool:
+    file_name = f"results_{embedding_model.replace('/', '_')}_{generator_model.replace('/', '_')}_{temperature}_{repeat_penalty}_{similarity}.csv"
     return os.path.exists(f'./results/{file_name}')
     
-def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5, cut_question=False):
+def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: str, temperature = 1, prompt: str = None, repeat_penalty = 1.5, cut_question=False, similarity_function="dot_product"):
     """
     Create a pipeline dynamically with the given embedding model and generator model.
 
@@ -44,7 +44,7 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
     text_embedder = SentenceTransformersTextEmbedder(model=embedding_model)
 
     # Load the document store with embeddings
-    document_store = load_document_store_with_embeddings(file_path=f'./data/{doc_store_name}')
+    document_store = load_document_store_with_embeddings(file_path=f'./data/{doc_store_name}', similarity_function=similarity_function)
 
     retriever = InMemoryEmbeddingRetriever(document_store=document_store, top_k = 1)
 
@@ -168,7 +168,7 @@ def evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_trut
 
     return results_df
 
-def save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty):
+def save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty, similarity):
     """
     Save the evaluation results as a CSV file.
 
@@ -176,7 +176,7 @@ def save_evaluation_results(results_df, embedding_model, generator_model, temper
     :param embedding_model: The name of the embedding model.
     :param generator_model: The name of the generator model.
     """
-    filename = f"./results/results_{embedding_model.replace("/", "_")}_{generator_model.replace("/", "_")}_{temperature}_{repeat_penalty}.csv"
+    filename = f"./results/results_{embedding_model.replace("/", "_")}_{generator_model.replace("/", "_")}_{temperature}_{repeat_penalty}_{similarity}.csv"
     results_df.to_csv(filename, index=False)
     print(f'Evaluation results saved as {filename}')
 
@@ -203,13 +203,13 @@ def save_test_data(test_questions, test_answers):
         json.dump(test_data, f, indent = 4)
     
     print(f'Test data saved as {filename}')
-def run_evaluation_for_models(embedding_models: list, generator_models: list, temperatures: list[float], repeat_penalties: list[float], prompt: str, cut_question=True, overwrite=False, test=False):
+def run_evaluation_for_models(embedding_models: list, generator_models: list, temperatures: list[float], repeat_penalties: list[float], similarity_function:str, prompt: str, cut_question=True, overwrite=False, test=False):
     for embedding_model in embedding_models:
         for generator_model in generator_models:
             for temperature in temperatures:
                 for repeat_penalty in repeat_penalties:
                     try:
-                        if not overwrite and check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty):
+                        if not overwrite and check_if_results_exist(embedding_model, generator_model, temperature, repeat_penalty, similarity_function):
                             print(f"Results already exist for {embedding_model} and {generator_model}. Skipping...")
                             continue
 
@@ -221,7 +221,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                             filtered_docs = embed_documents_grouped(embedding_model= embedding_model)
                             save_database_to_disk(filtered_docs, path='./data', name=doc_store_name)
                         
-                        rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty, cut_question=cut_question)
+                        rag_pipeline = create_pipeline(embedding_model, generator_model, doc_store_name = doc_store_name, temperature = temperature, prompt = prompt, repeat_penalty= repeat_penalty, cut_question=cut_question, similarity_function=similarity_function)
                         
                         questions = load_json_file('data/querys.json')
                         ground_truth_answers = load_json_file('data/answers.json')
@@ -244,7 +244,7 @@ def run_evaluation_for_models(embedding_models: list, generator_models: list, te
                         
                         results_df = evaluate_pipeline(rag_pipeline, questions, ground_truth_answers, ground_truth_docs)
                         
-                        save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty)
+                        save_evaluation_results(results_df, embedding_model, generator_model, temperature, repeat_penalty, similarity_function)
                         #rag_pipeline.graph._node["generator"]["instance"].model.close()
                     except Exception as e:
                         # Log any errors
@@ -257,9 +257,9 @@ if __name__ == "__main__":
     # Define your embedding and generator models here
     embedding_models = [
         # default: "sentence-transformers/all-MiniLM-L6-v2",
-        #"multi-qa-mpnet-base-cos-v1", # (mean, 420MB)
+        "multi-qa-mpnet-base-cos-v1", # (mean, 420MB)
         #"all-mpnet-base-v2", # performance (mean, 420MB)
-        "multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
+        #"multi-qa-MiniLM-L6-cos-v1", # (mean, 80MB, better at sentence embedding)
         #"all-MiniLM-L12-v2", # (mean, 120MB, better at semantic search)
         "multi-qa-mpnet-base-dot-v1", # similarity(CLS pooling, 420MB)
         #"sentence-transformers/nli-bert-base-max-pooling", # max pooling
@@ -287,5 +287,6 @@ if __name__ == "__main__":
     ts = [0.6]
 
     rps = [1]
-
-    run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=True)  
+    similarity_function = "cosine"
+    # similarity_function = "dot_product" 
+    run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, similarity_function=similarity_function, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=False)  

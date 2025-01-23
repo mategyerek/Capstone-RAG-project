@@ -89,14 +89,14 @@ def extract_document_contents(file_path):
     return document_contents
 
 
-def load_document_store_with_embeddings(file_path: str) -> InMemoryDocumentStore:
+def load_document_store_with_embeddings(file_path: str, similarity_function: str) -> InMemoryDocumentStore:
     """
     Load embeddings and documents from a JSON file into an InMemoryDocumentStore.
 
     :param file_path: Path to the JSON file containing the document store data.
     :return: An initialized InMemoryDocumentStore with documents having embeddings.
     """
-    document_store = InMemoryDocumentStore()
+    document_store = InMemoryDocumentStore(embedding_similarity_function=similarity_function)
 
     with open(file_path, "r") as file:
         data = json.load(file)
