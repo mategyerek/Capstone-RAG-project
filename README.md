@@ -4,11 +4,11 @@ This file serves as a documentation for the project Leveraging Large Language Mo
 This section will describe how to reproduce the results in our presentation. To run the more demanding parts in a reasonable time, GPU inference is recommended which requires special setup and hardware.
 
 ### Setting up the environment
-Clone this repository (please make sure to not commit anything, as you can only have read-write access).
+Clone this repository (or extract the zip file). Open a terminal in the root folder: `Capstone-RAG-project`.
 
 Make sure to use python 3.12. Run `pip install -r requirements.txt --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu --only-binary=llama-cpp-python` to install all the required modules. If there is no pre-built llama-cpp-python wheel compatible with your hardware this will fail. In this case resort to the [llama-cpp-python documentation](https://github.com/abetlen/llama-cpp-python/tree/main?tab=readme-ov-file#installation-configuration) for installing llama-cpp-python and install the rest of the packages from the requirements.
 
-Download the data from https://huggingface.co/datasets/vidore/syntheticDocQA_energy_test_ocr_chunk/tree/main. Place the contents (`test-00000-of-00002.parquet` and `test-00000-of-00002.parquet`) into `Capstone-RAG-project/data`.
+Download the data from https://huggingface.co/datasets/vidore/syntheticDocQA_energy_test_ocr_chunk/tree/main. Place the contents (`test-00000-of-00002.parquet` and `test-00000-of-00002.parquet`) into `Capstone-RAG-project/data`. Skip this step if you are using the zip as the data is already included.
 
 This should take care of the basic setup, but if any modules are missing just install them with pip.
 ### Special setup for GPU inference (optional)
@@ -32,7 +32,7 @@ Note that if you try this on Windows you will probably get an [error](https://gi
 ### Downloading models
 If you would like to run inference, the model weights need to be downloaded from huggingface (the models are several GB each, you can choose to omit any of them just make sure to exclude them from the parameter search). In our study the following models were used:
 
-* https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf
+* https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q4_K_M.gguf (included in zip)
 * https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q6_K.gguf
 * https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q3_K_L.gguf
 * https://huggingface.co/S10244414/Mistral-7B-v0.3-Q5_K_M-GGUF/resolve/main/mistral-7b-v0.3-q5_k_m.gguf
@@ -45,7 +45,7 @@ You can run `NO-RAG Chat.py` to get the baseline performance from GPT-4o. The AP
 You can run `eval_auto_pipeline_locallm.py` to evaluate a combination of LLM and embedding model or do a parameter search across multiple ones. Note that this will take a long time especially if its running on the CPU. For the parameter search you have to specify the list of embedding models and LLMs in source. The embedding models are loaded automatically but the LLM's .gguf file should be manually downloaded as described above.
 The parameters for the run need to be changed in source. Adjust the variables `embedding_models`, `generator_models`, `temperature` and `repeat_penalty` to reproduce specific runs. Set `test` to true if you want data on the test set. All the results are placed in the results folder.
 
-Finally, run the Data Analysis Notebook to produce the plots from the data.
+Finally, run the Data Analysis Notebook to produce the plots from the data. The results are already generated, so you can run this straight away.
 ## Description of program structure and design choices
 The following part gives an overview of our approach and process. It is not needed to reproduce the results, only to get a deeper understanding of the code.
 ### File structure
