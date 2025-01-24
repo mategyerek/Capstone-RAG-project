@@ -10,8 +10,14 @@ import random
 
 
 def embed_documents(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
+    """
+    This function is no longer in use! embed_documents_grouped() is used instead
+    Embed documents using a specified embedding model and store them in an InMemoryDocumentStore.
+
+    :param embedding_model: The embedding model to use (default is "sentence-transformers/all-MiniLM-L6-v2").
+    :return: An InMemoryDocumentStore containing the documents with embeddings.
+    """
     dataset = load_dataset("./data", split="test")
-    # TODO: optimize this and deduplicate
     docs = [Document(content=doc["text_description"],
                      meta={"filename": doc["image_filename"]}) for doc in dataset]
 
@@ -49,6 +55,12 @@ def save_database_to_disk(database, path: str, name: str) -> None:
 # save_database_to_disk(ds, path='./data')
 
 def embed_documents_grouped(embedding_model="sentence-transformers/all-MiniLM-L6-v2"):
+    """
+    Embeds a collection of text documents using the specified embedding model and stores them in an InMemoryDocumentStore.
+
+    :param embedding_model: The embedding model to use (default is "sentence-transformers/all-MiniLM-L6-v2").
+    :return: A document store object containing the embedded documents.
+    """
     with open("./data/texts.json", "r", encoding="utf-8") as f:
         dataset = json.load(f)
     docs = [
@@ -79,6 +91,12 @@ def load_json_file(file_path: str) -> dict:
 
 
 def extract_document_contents(file_path):
+    """
+    Extract the content of documents from a JSON file.
+
+    :param file_path: Path to the JSON file containing the documents.
+    :return: A list of Document objects with extracted content.
+    """
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
@@ -94,6 +112,7 @@ def load_document_store_with_embeddings(file_path: str, similarity_function: str
     Load embeddings and documents from a JSON file into an InMemoryDocumentStore.
 
     :param file_path: Path to the JSON file containing the document store data.
+    :param similarity_function: The similarity function to use for the document store. Either dot_product or cosine
     :return: An initialized InMemoryDocumentStore with documents having embeddings.
     """
     document_store = InMemoryDocumentStore(embedding_similarity_function=similarity_function)
@@ -121,6 +140,15 @@ def load_document_store_with_embeddings(file_path: str, similarity_function: str
     return document_store
 
 def split_list_data(data_list, val_ratio=0.8, test_ratio=0.2, seed=42):
+    """
+    Split a list into validation and test sets based on specified ratios.
+
+    :param data_list: The input list to split.
+    :param val_ratio: Proportion of the data for the validation set (default is 0.8).
+    :param test_ratio: Proportion of the data for the test set (default is 0.2).
+    :param seed: Seed for random shuffling to ensure reproducibility (default is 42).
+    :return: A tuple containing two lists: (validation_set, test_set).
+"""
     # Shuffle the data to ensure randomness
     random.seed(seed)
     random.shuffle(data_list)

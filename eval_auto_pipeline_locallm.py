@@ -284,9 +284,13 @@ if __name__ == "__main__":
     Question: {{question}}
     Answer: """
 
+    #Temperature of LLM 
     ts = [0.6]
 
+    #Repeat Penalty of LLM 
     rps = [1]
+
+    #Similarity function for vector similarity 
     similarity_function = "cosine"
     # similarity_function = "dot_product" 
     run_evaluation_for_models(embedding_models, generator_models, temperatures=ts, similarity_function=similarity_function, prompt = prompt, repeat_penalties=rps, cut_question=True, overwrite=False, test=False)  

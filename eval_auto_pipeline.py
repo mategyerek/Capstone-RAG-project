@@ -28,7 +28,7 @@ def log_error_to_file(error_message: str):
     """
     Log error messages to a separate text file.
     """
-    error_log_file = './results/errors.txt'
+    error_log_file = './data/errors.txt'
     with open(error_log_file, 'a') as f:
         f.write(f"{error_message}\n")
 
@@ -47,7 +47,7 @@ def create_pipeline(embedding_model: str, generator_model: str, doc_store_name: 
     text_embedder = SentenceTransformersTextEmbedder(model=embedding_model)
 
     # Load the document store with embeddings
-    document_store = load_document_store_with_embeddings(file_path=f'./data/{doc_store_name}')
+    document_store = load_document_store_with_embeddings(file_path=f'./data/{doc_store_name}', similarity_function= 'dot_product')
 
     retriever = InMemoryEmbeddingRetriever(document_store=document_store, top_k = 1)
 

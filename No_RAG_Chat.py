@@ -23,6 +23,24 @@ transformers.modeling_utils.logger.setLevel(logging.ERROR)
 
 
 if __name__ == "__main__":
+    """
+    Script for evaluating ChatGPT4o-mini's performance without RAG. 
+
+    This script loads document data, queries, and ground truth answers, sets up a pipeline with text embedding,
+    chat generation, and answer building, and evaluates the pipeline's performance using various metrics.
+
+    Key Functions:
+    - `evaluate_pipeline`: Evaluates the pipeline's performance by generating answers to the questions,
+      comparing them to ground truth answers, and computing metrics such as SAS and BERTScore.
+    - `save_evaluation_results_norag`: Saves evaluation results to a CSV file.
+
+    Components:
+    - Embedding model: "sentence-transformers/all-MiniLM-L6-v2"
+    - Generator model: "gpt-4o-mini"
+
+    :return: The evaluation results are saved to a CSV file with metrics for pipeline performance.
+    """
+
     embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
     text_embedder = SentenceTransformersTextEmbedder(
         model=embedding_model)
@@ -58,7 +76,7 @@ if __name__ == "__main__":
     basic_rag_pipeline.connect("generator.replies", "answer_builder.replies")
 
 
-
+    # Loading the necessary data
     questions = load_json_file('data/querys.json')
     ground_truth_answers = load_json_file('data/answers.json')
     all_documents = extract_document_contents('./data/DocMerged.json')
